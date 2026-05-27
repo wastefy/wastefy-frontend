@@ -1,0 +1,41 @@
+/* reset.css — CSS Reset & Base */
+
+/* @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800&display=swap'); */
+
+*,
+*::before,
+*::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body { height: 100%; width: 100%; }
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--color-text-dark);
+  background: #BEBEBE;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--t-slow);
+}
+
+#root {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 20px 0;
+}
+
+button { cursor: pointer; border: none; outline: none; font-family: var(--font-body); background: none; }
+input, select, textarea { outline: none; font-family: var(--font-body); border: none; }
+a { text-decoration: none; color: inherit; }
+ul, ol { list-style: none; }
+img { max-width: 100%; display: block; }
+::-webkit-scrollbar { width: 0; background: transparent; }
+
+@media (max-width: 430px) {
+  #root { padding: 0; }
+  body  { background: var(--color-bg-app); }
+}
