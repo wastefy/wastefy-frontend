@@ -1,0 +1,225 @@
+/* auth.css — Auth Screens (Landing, Login, etc.) */
+
+/* ---- Auth Screen Shell ---- */
+.auth-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-auth);
+  min-height: 844px;
+}
+
+.auth-body {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  padding: var(--sp-4) var(--sp-7) var(--sp-10);
+  padding-bottom: var(--sp-10);
+}
+
+/* ---- Landing Hero ---- */
+.auth-hero {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--sp-5);
+  padding-top: var(--sp-5);
+  padding-bottom: var(--sp-10);
+}
+
+.auth-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.auth-logo__text {
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: var(--fw-bold);
+  color: var(--color-text-inverse);
+  letter-spacing: -0.5px;
+}
+
+.auth-tagline {
+  font-family: var(--font-display);
+  font-size: 12px;
+  color: rgba(245, 240, 232, 0.78);
+  text-align: center;
+  line-height: 1.65;
+  max-width: 260px;
+}
+
+/* ---- Auth Actions (buttons group) ---- */
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+/* ---- Title & Subtitle ---- */
+.auth-title {
+  font-family: var(--font-display);
+  font-size: var(--fs-xl);
+  font-weight: var(--fw-bold);
+  color: var(--color-text-inverse);
+  text-align: center;
+  margin-bottom: var(--sp-2);
+}
+
+.auth-subtitle {
+  font-family: var(--font-display);
+  font-size: var(--fs-sm);
+  color: rgba(245, 240, 232, 0.72);
+  text-align: center;
+  line-height: 1.65;
+  margin-bottom: var(--sp-7);
+}
+
+/* ---- Form ---- */
+.form-group {
+  margin-bottom: var(--sp-4);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--fs-sm);
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-inverse);
+  margin-bottom: var(--sp-1);
+}
+
+.form-input {
+  width: 100%;
+  padding: 14px 18px;
+  background: var(--color-bg-input);
+  border: none;
+  border-radius: var(--radius-full);
+  font-size: var(--fs-sm);
+  color: var(--color-text-dark);
+  font-family: var(--font-body);
+  transition: background var(--t-base);
+}
+
+.form-input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.form-input:focus {
+  background: var(--color-bg-input-focus);
+}
+
+.form-forgot {
+  font-family: var(--font-display);
+  text-align: right;
+  margin-top: var(--sp-1);
+  font-size: var(--fs-xs);
+  color: rgba(245, 240, 232, 0.65);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---- Divider ---- */
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-2) 0;
+}
+
+.auth-divider::before,
+.auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.auth-divider span {
+  font-size: var(--fs-xs);
+  color: rgba(255, 255, 255, 0.45);
+}
+
+/* ---- Footer Link ---- */
+.auth-footer-link {
+  font-family: var(--font-display);
+  text-align: center;
+  margin-top: var(--sp-5);
+  font-size: var(--fs-sm);
+  color: rgba(245, 240, 232, 0.7);
+}
+
+.auth-footer-link a {
+  font-family: var(--font-display);
+  color: var(--color-text-inverse);
+  font-weight: var(--fw-bold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---- OTP ---- */
+.otp-icon__image {
+  width: 140px;
+  height: auto;
+  background: var(--color-bg-input);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--sp-8) auto var(--sp-5);
+  font-size: 44px;
+}
+
+.otp-row {
+  display: flex;
+  gap: var(--sp-4);
+  justify-content: center;
+  margin: var(--sp-7) 0;
+}
+
+.otp-box {
+  width: 64px;
+  height: 64px;
+  background: var(--color-bg-input);
+  border-radius: 14px;
+  text-align: center;
+  font-size: 22px;
+  font-weight: var(--fw-bold);
+  color: var(--color-text-dark);
+  border: 2px solid transparent;
+  transition: border-color var(--t-base), background var(--t-base);
+}
+
+.otp-box:focus {
+  border-color: var(--color-accent);
+  background: var(--color-bg-input-focus);
+}
+
+.otp-resend {
+  text-align: center;
+  margin-top: var(--sp-4);
+  font-size: var(--fs-sm);
+  color: rgba(245, 240, 232, 0.7);
+}
+
+.otp-resend a {
+  color: var(--color-text-inverse);
+  font-weight: var(--fw-bold);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* ---- Logo image ---- */
+.auth-logo__image {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+}
+
+
+.auth-logo--image-only .auth-logo__text {
+  display: none;
+}
