@@ -1,6 +1,3 @@
-/* ================================================
-   NotifSettingsPage.jsx — Allow / Block notifications
-   ================================================ */
 import { useApp } from '../../context/AppContext'
 import StatusBar from '../../components/layout/StatusBar'
 import BottomNav from '../../components/layout/BottomNav'
@@ -18,7 +15,6 @@ export default function NotifSettingsPage() {
     <div className="app-screen">
       <StatusBar variant="light" />
 
-      {/* Header with back */}
       <div className="app-header">
         <div className="app-header__back-row">
           <button
@@ -28,7 +24,7 @@ export default function NotifSettingsPage() {
           >
             <IconArrowLeft />
           </button>
-          <h1 className="app-header__title">Notification</h1>
+          <h1 className="app-header__title">Notifikasi</h1>
         </div>
       </div>
 

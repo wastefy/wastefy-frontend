@@ -1,5 +1,3 @@
-/* SuccessModal.jsx — Item added success feedback */
-
 import { useApp } from '../../context/AppContext'
 import { IconCheck } from '../common/Icons'
 

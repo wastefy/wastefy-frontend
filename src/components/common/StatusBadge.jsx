@@ -1,6 +1,3 @@
-/* ================================================
-   StatusBadge.jsx — Fresh / Soon / Expired / Used / Wasted
-   ================================================ */
 import { STATUS_LABELS } from '../../constants'
 
 export default function StatusBadge({ status }) {

@@ -1,5 +1,3 @@
-/* NotificationPage.jsx — Expiry notifications */
-
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
 import StatusBar from '../../components/layout/StatusBar'
@@ -15,7 +13,6 @@ export default function NotificationPage() {
     <div className="app-screen">
       <StatusBar variant="light" />
 
-      {/* Header */}
       <div className="app-header">
         <h1 className="app-header__title">Notifikasi</h1>
         <button
@@ -27,7 +24,6 @@ export default function NotificationPage() {
         </button>
       </div>
 
-      {/* Content */}
       <div className="app-content">
         {notifications.length === 0 ? (
           <EmptyState
@@ -36,7 +32,7 @@ export default function NotificationPage() {
           />
         ) : (
           <>
-            <p className="section-label">Today</p>
+            <p className="section-label">Hari ini</p>
             {notifications.map((n) => (
               <div key={n.id} className="notif-card">
                 <div className="notif-card__avatar">

@@ -1,6 +1,3 @@
-/* EditProfilePage.jsx — Edit name & linked accounts
-   Avatar hanya inisial dari nama, tidak bisa upload foto */
-
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import StatusBar from '../../components/layout/StatusBar'
@@ -8,7 +5,6 @@ import BottomNav from '../../components/layout/BottomNav'
 import { IconArrowLeft } from '../../components/common/Icons'
 import emailIcon from '../../assets/images/icon-email.png'
 
-/* ── Hitung inisial dari nama (maks 2 huruf) ── */
 function getInitials(name = '') {
   return name
     .trim()
@@ -43,7 +39,6 @@ export default function EditProfilePage() {
     <div className="app-screen">
       <StatusBar variant="light" />
 
-      {/* Header */}
       <div className="app-header">
         <div className="app-header__back-row">
           <button className="app-header__icon-btn" onClick={goBack} aria-label="Go back">
@@ -51,25 +46,16 @@ export default function EditProfilePage() {
           </button>
           <h1 className="app-header__title">Edit Profil</h1>
         </div>
-        <button
-          className="app-header__icon-btn"
-          style={{ color: 'var(--color-accent)', fontWeight: 700, fontSize: 'var(--fs-sm)' }}
-          onClick={handleSave}
-        >
-          Simpan
-        </button>
       </div>
 
       <div className="app-content" style={{ padding: '0 16px 110px' }}>
 
-        {/* ── Avatar — hanya inisial, tidak bisa diganti foto ── */}
         <div className="edit-profile-avatar-wrap">
           <div className="edit-profile-avatar">
             <span className="edit-profile-avatar__initials">{initials}</span>
           </div>
         </div>
 
-        {/* ── Name & Email ── */}
         <div className="edit-profile-section">
           <div className="edit-profile-field">
             <label className="edit-profile-field__label">Nama</label>
@@ -77,7 +63,7 @@ export default function EditProfilePage() {
               className="edit-profile-field__input"
               type="text"
               value={name}
-              placeholder="Enter your full name"
+              placeholder="Masukkan nama anda"
               onChange={e => setName(e.target.value)}
             />
           </div>
@@ -87,17 +73,15 @@ export default function EditProfilePage() {
               className="edit-profile-field__input"
               type="email"
               value={email}
-              placeholder="Enter your email"
+              placeholder="Masukkan email anda"
               onChange={e => setEmail(e.target.value)}
             />
           </div>
         </div>
 
-        {/* ── Linked Accounts ── */}
         <p className="section-label" style={{ marginTop: 'var(--sp-4)' }}>Akun yang Terhubung</p>
         <div className="edit-profile-section">
 
-          {/* Google */}
           <div className="linked-account-row">
             <div className="linked-account-row__left">
               <svg width="22" height="22" viewBox="0 0 18 18">
@@ -121,7 +105,6 @@ export default function EditProfilePage() {
             </span>
           </div>
 
-          {/* Email — pakai asset foto */}
           <div className="linked-account-row" style={{ borderTop: '1px solid var(--color-border)' }}>
             <div className="linked-account-row__left">
               <img
@@ -141,7 +124,6 @@ export default function EditProfilePage() {
 
         </div>
 
-        {/* ── Save button ── */}
         <button
           className="btn btn--primary"
           style={{ marginTop: 'var(--sp-4)' }}

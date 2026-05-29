@@ -1,5 +1,3 @@
-/* layout.css — Phone, App Shell, Nav, Animations */
-
 .phone-wrapper {
   width: 390px;
   min-height: 844px;
@@ -17,7 +15,7 @@
   .phone-wrapper { width: 100vw; min-height: 100dvh; border-radius: 0; }
 }
 
-/* ---- App Screen ---- */
+/* app screen */
 .app-screen {
   flex: 1;
   display: flex;
@@ -28,7 +26,7 @@
   transition: background var(--t-slow);
 }
 
-/* ---- Header ---- */
+/* header */
 .app-header {
   display: flex;
   justify-content: space-between;
@@ -61,7 +59,7 @@
 
 .app-header__icon-btn:hover { opacity: 0.6; }
 
-/* ---- Content ---- */
+/* content */
 .app-content {
   flex: 1;
   padding: 0 var(--sp-4) 110px;
@@ -69,7 +67,7 @@
   max-height: 700px;
 }
 
-/* ---- Bottom Nav ---- */
+/* bottom nav */
 .bottom-nav {
   position: absolute;
   bottom: 0; left: 0; right: 0;
@@ -98,7 +96,7 @@
 .bottom-nav__item--active { color: var(--color-navbar-active); }
 .bottom-nav__item:hover   { background: rgba(255,255,255,0.1); }
 
-/* ---- FAB ---- */
+/* FAB */
 .fab {
   position: absolute;
   bottom: 84px; right: var(--sp-6);
@@ -114,7 +112,7 @@
 .fab:hover  { transform: scale(1.08); }
 .fab:active { transform: scale(0.95); }
 
-/* ---- Filter Tabs ---- */
+/* Filter Tabs */
 .filter-tabs {
   display: flex;
   gap: var(--sp-1);
@@ -140,7 +138,7 @@
   color: var(--color-bg-app);
 }
 
-/* ---- Section Label ---- */
+/* section label */
 .section-label {
   font-size: var(--fs-sm);
   font-weight: var(--fw-bold);
@@ -148,7 +146,7 @@
   margin-bottom: var(--sp-3);
 }
 
-/* ---- Animations ---- */
+/* animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0);   }

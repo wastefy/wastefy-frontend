@@ -1,4 +1,3 @@
-/* SignUpPage.jsx — New account registration */
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
@@ -17,7 +16,7 @@ export default function SignUpPage() {
       <div className="auth-body">
         <h1 className="auth-title">Daftar</h1>
         <p className="auth-subtitle">
-          Buat akun untuk menjelajahi dan memulai perjalanan Anda hari ini.
+          Buat akun untuk memulai pencatatan stok anda.
         </p>
 
         <div className="form-group">

@@ -1,5 +1,3 @@
-/* Welcome / entry screen */
-
 import { useApp }    from '../../context/AppContext'   
 import { SCREENS }   from '../../constants'            
 import StatusBar     from '../../components/layout/StatusBar'
@@ -15,7 +13,6 @@ export default function LandingPage() {
       <StatusBar variant="dark" />
 
       <div className="auth-body">
-        {/* ── Hero ── */}
         <div className="auth-hero">
           <div className="auth-logo">
             <img src={logoImage} alt="Wastefy" className="auth-logo__image" />
@@ -26,7 +23,6 @@ export default function LandingPage() {
           </p>
         </div>
 
-        {/* ── Actions ── */}
         <div className="auth-actions">
           <button className="btn btn--outline" onClick={() => navigate(SCREENS.LOGIN)}>
             Masuk

@@ -1,14 +1,3 @@
-/* 
-   AddItemModal.jsx — Form input item fresh produce
-
-   Field & default:
-   1. nama_item     → dari prediksi AI, kosong jika manual
-   2. jenis_item    → otomatis dari nama_item (tidak perlu diisi user)
-   3. kondisi_fisik → dari prediksi AI, kosong jika manual
-   4. lokasi_simpan → default "Kulkas" (mayoritas buah/sayur disimpan di kulkas)
-   5. tanggal_beli  → default hari ini
-*/
-
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState, useRef, useCallback } from 'react'
@@ -49,7 +38,7 @@ function calcExpiryDate(days) {
   return d.toISOString().split('T')[0]
 }
 
-/* ── Tebak jenis (Sayuran/Buah) dari nama item ── */
+/* Tebak jenis sayur/buah dari nama item */
 function guessCategory(name) {
   if (!name) return ''
   const lower = name.toLowerCase()
@@ -60,13 +49,12 @@ function guessCategory(name) {
   return ''
 }
 
-/* ── State awal form ── */
 const BLANK = {
-  name:      '',         // dari AI atau pilihan manual
-  category:  '',         // otomatis dari nama
-  condition: '',         // dari AI atau pilihan manual
-  storedIn:  'Pendingin',   // default terbaik untuk mayoritas buah/sayur
-  buyDate:   TODAY,      // default hari ini
+  name:      '',        
+  category:  '',         
+  condition: '',         
+  storedIn:  'Pendingin',   
+  buyDate:   TODAY,      
   quantity:  '',
   imageUrl:  null,
   imageFile: null,
@@ -82,10 +70,8 @@ export default function AddItemModal() {
   const [showRottenConfirm, setRotten]  = useState(false)
   const photoRef                        = useRef(null)
 
-  /* ── Derived ── */
   const conditionOptions = form.category ? (CONDITION_OPTIONS[form.category] ?? []) : []
 
-  // Semua nama buah+sayur untuk input manual (tanpa kategori)
   const allItems = [
     ...FRESH_ITEMS.Sayuran.map(n => ({ name: n, cat: 'Sayur' })),
     ...FRESH_ITEMS.Buah.map(n    => ({ name: n, cat: 'Buah'    })),
@@ -95,13 +81,11 @@ export default function AddItemModal() {
     ? estimateShelfLife(form.name, form.condition, form.storedIn, form.category)
     : null
 
-  /* ── Ketika nama dipilih manual → auto-set category ── */
   const handleNameChange = (name) => {
     const cat = guessCategory(name)
     setForm(p => ({ ...p, name, category: cat, condition: '' }))
   }
 
-  /* ── Upload foto → AI detect ── */
   const handlePhotoForAI = useCallback(async (file) => {
     if (!file) return
     set('imageUrl', URL.createObjectURL(file))
@@ -137,7 +121,6 @@ export default function AddItemModal() {
       setAiResult(result)
       setAiState('done')
 
-      /* ── Auto-fill: nama (1) + jenis (2) + kondisi (5) dari AI ── */
       setForm(p => ({
         ...p,
         name:      result.name      ?? p.name,
@@ -151,14 +134,12 @@ export default function AddItemModal() {
     }
   }, [])
 
-  /* ── Reset foto ── */
   const clearPhoto = () => {
     setForm(p => ({ ...p, imageUrl: null, imageFile: null, name: '', category: '', condition: '' }))
     setAiState('idle')
     setAiResult(null)
   }
 
-  /* ── Submit ── */
   const handleSubmit = () => {
     if (!form.name || !form.category || !form.condition) return
     const condObj = conditionOptions.find(c => c.value === form.condition)
@@ -187,7 +168,6 @@ export default function AddItemModal() {
     })
   }
 
-  /* ── UI: konfirmasi busuk ── */
   if (showRottenConfirm) return (
     <div className="modal-overlay" onClick={() => setRotten(false)}>
       <div className="modal-sheet anim-slide-up" onClick={e => e.stopPropagation()}>
@@ -209,7 +189,6 @@ export default function AddItemModal() {
     </div>
   )
 
-  /* ── UI: form utama ── */
   return (
     <div className="modal-overlay" onClick={() => setAddModalOpen(false)}>
       <div className="modal-sheet anim-slide-up" onClick={e => e.stopPropagation()}>
@@ -221,7 +200,6 @@ export default function AddItemModal() {
           <button className="modal-header__close" onClick={() => setAddModalOpen(false)}>✕</button>
         </div>
 
-        {/* ══ ZONA FOTO ══ */}
         {!form.imageUrl ? (
           <div className="add-photo-zone" onClick={() => photoRef.current?.click()}>
             <input ref={photoRef} type="file" accept="image/*" style={{ display: 'none' }}
@@ -249,7 +227,6 @@ export default function AddItemModal() {
               </button>
             </div>
 
-            {/* Banner status AI */}
             {aiState === 'loading' && (
               <div className="add-ai-banner add-ai-banner--loading">
                 <div className="add-spinner" />
@@ -290,7 +267,6 @@ export default function AddItemModal() {
           </div>
         )}
 
-        {/* ══ FORM ══ */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', marginTop: 'var(--sp-3)' }}>
 
           {/* 1. Nama item — dari AI atau pilih manual */}
@@ -302,7 +278,7 @@ export default function AddItemModal() {
               onChange={e => handleNameChange(e.target.value)}
             >
               <option value="">
-                {aiState === 'loading' ? 'AI sedang mendeteksi...' : '— Pilih atau tunggu deteksi AI —'}
+                {aiState === 'loading' ? 'AI sedang mendeteksi...' : 'Pilih atau tunggu deteksi AI'}
               </option>
               {allItems.map(({ name, cat }) => (
                 <option key={name} value={name}>{name}</option>
@@ -341,10 +317,10 @@ export default function AddItemModal() {
             >
               <option value="">
                 {!form.category
-                  ? '— pilih nama dulu —'
+                  ? 'Pilih nama item dahulu'
                   : aiState === 'loading'
                     ? 'AI sedang mendeteksi...'
-                    : '— Pilih kondisi —'
+                    : 'Pilih kondisi'
                 }
               </option>
               {conditionOptions.map(c => (

@@ -1,6 +1,3 @@
-/* ================================================
-   ForgotPasswordPage.jsx — Request password reset
-   ================================================ */
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
@@ -15,18 +12,18 @@ export default function ForgotPasswordPage() {
       <StatusBar variant="dark" />
 
       <div className="auth-body">
-        <h1 className="auth-title">Forgot Password</h1>
+        <h1 className="auth-title">Lupa Kata Sandi</h1>
         <p className="auth-subtitle">
-          Enter your email address to receive a reset link and regain
-          access to your account.
+          Masukkan alamat email Anda untuk menerima tautan reset dan memulihkan
+          akses ke akun Anda.
         </p>
 
         <div className="form-group">
-          <label className="form-label">Email Address</label>
+          <label className="form-label">Alamat Email</label>
           <input
             className="form-input"
             type="email"
-            placeholder="Enter your email"
+            placeholder="Masukkan email Anda"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
@@ -37,7 +34,7 @@ export default function ForgotPasswordPage() {
           style={{ marginTop: 8 }}
           onClick={() => navigate(SCREENS.OTP)}
         >
-          Continue
+          Lanjutkan
         </button>
       </div>
     </div>

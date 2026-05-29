@@ -1,5 +1,3 @@
-/* App.jsx — Root router */
-
 import { useApp } from './context/AppContext'
 import { SCREENS } from './constants'
 

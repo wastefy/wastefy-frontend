@@ -1,6 +1,4 @@
-/* auth.css — Auth Screens (Landing, Login, etc.) */
-
-/* ---- Auth Screen Shell ---- */
+/* auth screen */
 .auth-screen {
   flex: 1;
   display: flex;
@@ -18,7 +16,7 @@
   padding-bottom: var(--sp-10);
 }
 
-/* ---- Landing Hero ---- */
+/* landing hero */
 .auth-hero {
   flex: 1;
   display: flex;
@@ -53,14 +51,14 @@
   max-width: 260px;
 }
 
-/* ---- Auth Actions (buttons group) ---- */
+/* auth actions */
 .auth-actions {
   display: flex;
   flex-direction: column;
   gap: var(--sp-2);
 }
 
-/* ---- Title & Subtitle ---- */
+/* auth title */
 .auth-title {
   font-family: var(--font-display);
   font-size: var(--fs-xl);
@@ -79,7 +77,7 @@
   margin-bottom: var(--sp-7);
 }
 
-/* ---- Form ---- */
+/* form */
 .form-group {
   margin-bottom: var(--sp-4);
 }
@@ -122,7 +120,7 @@
   cursor: pointer;
 }
 
-/* ---- Divider ---- */
+/* divider */
 .auth-divider {
   display: flex;
   align-items: center;
@@ -143,7 +141,7 @@
   color: rgba(255, 255, 255, 0.45);
 }
 
-/* ---- Footer Link ---- */
+/* footer link */
 .auth-footer-link {
   font-family: var(--font-display);
   text-align: center;
@@ -160,7 +158,7 @@
   cursor: pointer;
 }
 
-/* ---- OTP ---- */
+/* otp */
 .otp-icon__image {
   width: 140px;
   height: auto;
@@ -212,7 +210,7 @@
   cursor: pointer;
 }
 
-/* ---- Logo image ---- */
+/* logo image */
 .auth-logo__image {
   height: 80px;
   width: auto;

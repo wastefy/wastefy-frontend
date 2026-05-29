@@ -1,6 +1,3 @@
-/* ================================================
-   OTPPage.jsx — 4-digit OTP verification
-   ================================================ */
 import { useState, useRef } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
@@ -35,12 +32,11 @@ export default function OTPPage() {
           <img src={logoImage} alt="Enter OTP" className="otp-icon__image" />
         </div>
 
-        <h1 className="auth-title">Enter OTP</h1>
+        <h1 className="auth-title">Masukkan Kode OTP</h1>
         <p className="auth-subtitle">
-          Enter the 4-digit code sent to your registered email address
+          Masukkan 4 kode angka yang telah dikirim ke email terdaftar Anda
         </p>
 
-        {/* OTP inputs */}
         <div className="otp-row">
           {otp.map((val, i) => (
             <input
@@ -61,11 +57,11 @@ export default function OTPPage() {
           className="btn btn--primary"
           onClick={() => navigate(SCREENS.SET_PASSWORD)}
         >
-          Verify Code
+          Verifikasi Kode
         </button>
 
         <p className="otp-resend">
-          Didn't get OTP? <a>Resend OTP</a>
+          Tidak menerima OTP? <a>Kirim Ulang</a>
         </p>
       </div>
     </div>

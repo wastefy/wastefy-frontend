@@ -1,7 +1,3 @@
-/* 
-   SettingsPage.jsx — App settings
-   Avatar hanya inisial, tidak ada foto profile */
-
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
 import StatusBar from '../../components/layout/StatusBar'
@@ -41,15 +37,12 @@ export default function SettingsPage() {
       </div>
 
       <div className="app-content" style={{ padding: '0 16px 110px' }}>
-
-        {/* Profile Card — klik buka Edit Profile */}
         <div
           className="settings-profile-card"
           style={{ cursor: 'pointer' }}
           onClick={() => navigate(SCREENS.EDIT_PROFILE)}
         >
           <div className="settings-profile-card__left">
-            {/* Avatar — hanya inisial */}
             <div className="settings-profile-card__avatar">
               <span style={{
                 fontSize: 18,
@@ -69,7 +62,6 @@ export default function SettingsPage() {
           </button>
         </div>
 
-        {/* Menu */}
         <div className="settings-menu-card">
           <div className="settings-menu-item" onClick={() => navigate(SCREENS.NOTIF_SETTINGS)}>
             <div className="settings-menu-item__left"><IconBell /> Notifikasi</div>

@@ -1,4 +1,3 @@
-/* LoginPage.jsx — Email + password login */
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'

@@ -1,5 +1,3 @@
-/* EmptyState.jsx — Blank state with mascot image */
-
 export default function EmptyState({ image, text }) {
   return (
     <div className="empty-state">

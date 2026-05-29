@@ -1,5 +1,3 @@
-/* HistoryPage.jsx — Used / Wasted item history */
-
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
 import StatusBar from '../../components/layout/StatusBar'
@@ -8,6 +6,13 @@ import EmptyState from '../../components/common/EmptyState'
 import StatusBadge from '../../components/common/StatusBadge'
 import { IconSettings } from '../../components/common/Icons'
 import mascotHistory from '../../assets/images/mascot-history.png'
+import assetBuah    from '../../assets/images/default-buah.png'
+import assetSayuran from '../../assets/images/default-sayur.png'
+
+const DEFAULT_ASSET = {
+  Buah:    assetBuah,
+  Sayuran: assetSayuran,
+}
 
 const FILTERS = [
   { label: 'Semua',    value: 'all'    },
@@ -32,7 +37,6 @@ export default function HistoryPage() {
     <div className="app-screen">
       <StatusBar variant="light" />
 
-      {/* Header */}
       <div className="app-header">
         <h1 className="app-header__title">Riwayat</h1>
         <button
@@ -44,7 +48,6 @@ export default function HistoryPage() {
         </button>
       </div>
 
-      {/* Filter tabs */}
       <div className="filter-tabs">
         {FILTERS.map(({ label, value }) => (
           <button
@@ -57,7 +60,6 @@ export default function HistoryPage() {
         ))}
       </div>
 
-      {/* Content */}
       <div className="app-content">
         {filtered.length === 0 ? (
           <EmptyState
@@ -72,7 +74,6 @@ export default function HistoryPage() {
 
             {filtered.map((item) => (
               <div key={item.id} className="history-card">
-                {/* Top — same layout as StockCard */}
                 <div className="stock-card__top">
                   <div className="stock-card__image">
                     {item.imageUrl
@@ -86,20 +87,18 @@ export default function HistoryPage() {
                       <StatusBadge status={item.status} />
                     </div>
                     <div className="stock-card__detail">
-                      <div>Input Date: {item.inputDate}</div>
-                      <div>Category: {item.category}</div>
-                      <div>Quantity: {item.quantity}</div>
-                      <div>Stored In: {item.storedIn}</div>
+                      <div>Kondisi: {item.conditionLabel ?? item.condition ?? '—'}</div>
+                      <div>Lokasi: {item.storedIn ?? '—'}</div>
+                      <div>Tanggal beli: {item.buyDate ?? item.inputDate ?? '—'}</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Footer */}
                 <div className="history-card__footer">
                   <span>
                     {item.status === 'used'
-                      ? `Used on ${item.date}`
-                      : `Wasted on ${item.date}${item.isExpired ? ' (Expired)' : ''}`
+                      ? `Terpakai pada ${item.date}`
+                      : `Terbuang pada ${item.date}${item.isExpired ? ' (Kadaluwarsa)' : ''}`
                     }
                   </span>
                   {item.status === 'wasted' && (
@@ -107,7 +106,7 @@ export default function HistoryPage() {
                       className="history-card__add-back"
                       onClick={() => addBackToStock(item.id)}
                     >
-                      Add Back to Stock
+                      Tambahkan Kembali ke Stok
                     </button>
                   )}
                 </div>

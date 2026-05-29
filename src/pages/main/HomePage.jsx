@@ -1,5 +1,3 @@
-/* HomePage.jsx — Your Current Stock dashboard */
-
 import { useApp } from '../../context/AppContext'
 import { SCREENS, STOCK_STATUS } from '../../constants'
 import StatusBar from '../../components/layout/StatusBar'
@@ -37,7 +35,6 @@ export default function HomePage() {
     <div className="app-screen">
       <StatusBar variant="light" />
 
-      {/* Header */}
       <div className="app-header">
         <h1 className="app-header__title">Stok Anda</h1>
         <button
@@ -49,7 +46,6 @@ export default function HomePage() {
         </button>
       </div>
 
-      {/* Filter tabs */}
       <div className="filter-tabs">
         {FILTERS.map(({ label, value }) => (
           <button
@@ -62,7 +58,6 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Content */}
       <div className="app-content">
         {filtered.length === 0 ? (
           <EmptyState
@@ -74,7 +69,6 @@ export default function HomePage() {
         )}
       </div>
 
-      {/* FAB */}
       <button
         className="fab"
         onClick={() => setAddModalOpen(true)}
@@ -83,7 +77,6 @@ export default function HomePage() {
         <IconPlus />
       </button>
 
-      {/* Modals */}
       {addModalOpen    && <AddItemModal />}
       {successModalOpen && <SuccessModal />}
 

@@ -43,30 +43,25 @@ export function AppProvider({ children }) {
     navigate(SCREENS.ITEM_DETAIL)
   }
 
-  /* ── addStock: terima objek item lengkap ── */
   const addStock = (item) => {
     const newItem = {
-      /* field wajib */
       id:        Date.now(),
       name:      item.name,
-      category:  item.category,     // 'Sayuran' | 'Buah' | dll
-      itemType:  item.itemType,     // 'fresh' | 'packaged'
+      category:  item.category,    
+      itemType:  item.itemType,    
       quantity:  item.quantity ?? '',
       storedIn:  item.storedIn ?? '',
       inputDate: new Date().toLocaleDateString('id-ID'),
       imageUrl:  item.imageUrl ?? null,
       emoji:     item.emoji ?? '🥗',
 
-      /* fresh produce */
-      condition:       item.condition ?? null,      // 'segar' | 'matang' | dll
-      estimatedExpiry: item.estimatedExpiry ?? null,// Date string ISO
-      shelfDays:       item.shelfDays ?? null,      // angka hari
+      condition:       item.condition ?? null,      
+      estimatedExpiry: item.estimatedExpiry ?? null,
+      shelfDays:       item.shelfDays ?? null,      
       aiConfidence:    item.aiConfidence ?? null,
 
-      /* packaged */
-      expiryDate:      item.expiryDate ?? null,     // tanggal dari kemasan
+      expiryDate:      item.expiryDate ?? null, 
 
-      /* computed status */
       status: item.status ?? 'fresh',
     }
 

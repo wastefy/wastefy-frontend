@@ -1,6 +1,5 @@
-/* variables.css — Design Tokens (Light + Dark Mode) */
+/* light mode (default) */
 
-/* ---- Light mode (default) ---- */
 :root,
 [data-theme="light"] {
   --color-primary:        #595A57;
@@ -46,7 +45,7 @@
   --shadow-phone: 0 24px 80px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.08);
 }
 
-/* ---- Dark mode ---- */
+/* dark mode */
 [data-theme="dark"] {
   --color-bg-auth:        #2E4428;
   --color-bg-app:         #121212;
@@ -69,7 +68,7 @@
   --shadow-phone: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.06);
 }
 
-/* ---- Typography (shared) ---- */
+/* typography */
 :root {
   --font-display: 'Celias', serif;
   --font-body:    'Avenir', system-ui, sans-serif;
@@ -102,7 +101,7 @@
   --t-spring: 0.32s cubic-bezier(0.32, 0.72, 0, 1);
 }
 
-/* ---- Font Celias ---- */
+/* font */
 @font-face {
   font-family: 'Celias';
   src: url('../assets/fonts/Celias-Exfontb240.otf') format('opentype');
@@ -111,7 +110,6 @@
   font-display: swap;
 }
 
-/* ---- Font Avenir ---- */
 @font-face {
   font-family: 'Avenir';
   src: url('../assets/fonts/Avenir LT Std Heavy.otf') format('opentype');

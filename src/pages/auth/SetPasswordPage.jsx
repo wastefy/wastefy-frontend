@@ -1,5 +1,3 @@
-/* SetPasswordPage.jsx — Create new password */
-
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
@@ -20,28 +18,28 @@ export default function SetPasswordPage() {
           <img src={logoImage} alt="Set New Password" className="otp-icon__image" />
         </div>
 
-        <h1 className="auth-title">Set New Password</h1>
+        <h1 className="auth-title">Atur Kata Sandi Baru</h1>
         <p className="auth-subtitle">
-          Enter your new password below to regain access.
+          Masukkan kata sandi baru Anda di bawah ini untuk memulihkan akses.
         </p>
 
         <div className="form-group">
-          <label className="form-label">Enter New Password</label>
+          <label className="form-label">Kata Sandi Baru</label>
           <input
             className="form-input"
             type="password"
-            placeholder="Enter your new password"
+            placeholder="Masukkan kata sandi baru"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
 
         <div className="form-group">
-          <label className="form-label">Confirm Password</label>
+          <label className="form-label">Konfirmasi Kata Sandi</label>
           <input
             className="form-input"
             type="password"
-            placeholder="Confirm password"
+            placeholder="Konfirmasi kata sandi"
             value={confirm}
             onChange={(e) => setConfirm(e.target.value)}
           />
@@ -52,7 +50,7 @@ export default function SetPasswordPage() {
           style={{ marginTop: 8 }}
           onClick={() => navigate(SCREENS.HOME)}
         >
-          Reset Password
+          Atur Ulang Kata Sandi
         </button>
       </div>
     </div>

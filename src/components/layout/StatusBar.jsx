@@ -1,7 +1,3 @@
-/* ================================================
-   StatusBar.jsx — iOS-style status bar
-   ================================================ */
-
 export default function StatusBar({ variant = 'light' }) {
   const isDark = variant === 'dark'
   const iconColor = isDark ? '#F5F0E8' : '#1A1A1A'

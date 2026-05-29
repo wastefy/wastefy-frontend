@@ -1,19 +1,8 @@
-/* ================================================
-   StockCard.jsx — Tap card → buka Item Detail page
-   
-   Prioritas gambar thumbnail:
-   1. item.imageUrl  → foto yang diupload user
-   2. asset kategori → defaultAsset[category] (Buah/Sayur)
-   3. fallback       → emoji (kategori lain seperti Protein, dll)
-   ================================================ */
 import { useApp } from '../../context/AppContext'
 import StatusBadge from '../common/StatusBadge'
-
-/* ── Import asset default per kategori ── */
 import assetBuah    from '../../assets/images/default-buah.png'
 import assetSayuran from '../../assets/images/default-sayur.png'
 
-/* ── Map kategori → asset ── */
 const DEFAULT_ASSET = {
   Buah:    assetBuah,
   Sayuran: assetSayuran,
@@ -36,7 +25,6 @@ export default function StockCard({ item }) {
     setStocks(prev => prev.filter(s => s.id !== id))
   }
 
-  /* ── Tentukan thumbnail yang ditampilkan ── */
   const renderThumbnail = () => {
     /* 1. Foto dari user (upload manual / AI) */
     if (item.imageUrl) {
@@ -86,13 +74,13 @@ export default function StockCard({ item }) {
           className="action-btn action-btn--used"
           onClick={() => markUsed(item.id)}
         >
-          Used
+          Pakai
         </button>
         <button
           className="action-btn action-btn--throw"
           onClick={() => throwAway(item.id)}
         >
-          Throw Away
+          Buang
         </button>
         <button
           className="action-btn action-btn--remove"

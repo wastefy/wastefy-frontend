@@ -59,13 +59,13 @@ export const STATUS_LABELS = {
 /* KONDISI FISIK — berbeda per jenis */
 export const CONDITION_OPTIONS = {
   Sayuran: [
-    { value: 'segar',       label: 'Segar',        multiplier: 1.0,  color: '#4CAF50', status: 'fresh'   },
+    { value: 'Segar',       label: 'Segar',        multiplier: 1.0,  color: '#4CAF50', status: 'fresh'   },
     { value: 'busuk',       label: 'Busuk',        multiplier: 0,    color: '#F44336', status: 'expired' },
   ],
   Buah: [
     { value: 'mentah',        label: 'Mentah',         multiplier: 1.5,  color: '#64B5F6', status: 'fresh'   },
     { value: 'matang',        label: 'Matang',          multiplier: 1.0,  color: '#4CAF50', status: 'fresh'   },
-    { value: 'terlalu_matang',label: 'Terlalu Matang',  multiplier: 0.4,  color: '#FFC107', status: 'soon'    },
+    { value: 'Terlalu Matang',label: 'Terlalu Matang',  multiplier: 0.4,  color: '#FFC107', status: 'soon'    },
     { value: 'busuk',         label: 'Busuk',           multiplier: 0,    color: '#F44336', status: 'expired' },
   ],
 }

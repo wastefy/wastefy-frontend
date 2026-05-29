@@ -1,6 +1,3 @@
-/* ================================================
-   BottomNav.jsx — Bottom navigation bar
-   ================================================ */
 import { useApp } from '../../context/AppContext'
 import { TABS } from '../../constants'
 
