@@ -325,7 +325,17 @@
   font-size: var(--fs-sm); color: var(--color-text-dark);
   font-family: var(--font-body);
   transition: background var(--t-base);
+  
 }
+
+.date-picker-wrapper {
+  width: 100%; /* Atau sesuaikan dengan layout modal Anda */
+}
+/* Memastikan input di dalamnya juga mengisi penuh wrapper */
+.date-picker-wrapper .modal-input {
+  width: 100%;
+}
+
 .modal-input::placeholder { color: var(--color-text-muted); }
 .modal-input:focus { background: var(--color-bg-input-focus); }
 

@@ -60,7 +60,6 @@ export const STATUS_LABELS = {
 export const CONDITION_OPTIONS = {
   Sayuran: [
     { value: 'segar',       label: 'Segar',        multiplier: 1.0,  color: '#4CAF50', status: 'fresh'   },
-    { value: 'mulai_layu',  label: 'Mulai Layu',   multiplier: 0.5,  color: '#FFC107', status: 'soon'    },
     { value: 'busuk',       label: 'Busuk',        multiplier: 0,    color: '#F44336', status: 'expired' },
   ],
   Buah: [
@@ -80,7 +79,7 @@ export const SHELF_LIFE_BASE = {
   'kentang':        { base: 14, kulkas: 21, suhuRuang: 14 },
   'tomat':          { base: 5,  kulkas: 10, suhuRuang: 5  },
   'cabai':          { base: 7,  kulkas: 14, suhuRuang: 5  },
-  'timun':          { base: 5,  kulkas: 7,  suhuRuang: 3  },
+  'mentimun':          { base: 5,  kulkas: 7,  suhuRuang: 3  },
   
   /* Buah */
   'pisang':         { base: 5,  kulkas: 7,  suhuRuang: 5  },
@@ -97,7 +96,7 @@ export const SHELF_LIFE_BASE = {
 
 export const FRESH_ITEMS = {
   Sayuran: [
-    'Wortel', 'Kentang','Tomat', 'Cabai','Timun',
+    'Wortel', 'Kentang','Tomat', 'Cabai','Mentimun',
   ],
   Buah: [
     'Pisang', 'Apel', 'Mangga', 'Jeruk', 'Anggur',

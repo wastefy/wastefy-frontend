@@ -7,12 +7,10 @@
    3. kondisi_fisik → dari prediksi AI, kosong jika manual
    4. lokasi_simpan → default "Kulkas" (mayoritas buah/sayur disimpan di kulkas)
    5. tanggal_beli  → default hari ini
-
-   Kolom yang DIHAPUS vs sebelumnya:
-   - Segmented control (Sayuran / Buah) → tidak perlu lagi, AI yang tentukan
-   - Jenis item sebagai field terpisah   → cukup tampil sebagai label kecil di bawah nama
 */
 
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { useState, useRef, useCallback } from 'react'
 import { useApp } from '../../context/AppContext'
 import {
@@ -67,7 +65,7 @@ const BLANK = {
   name:      '',         // dari AI atau pilihan manual
   category:  '',         // otomatis dari nama
   condition: '',         // dari AI atau pilihan manual
-  storedIn:  'Kulkas',   // default terbaik untuk mayoritas buah/sayur
+  storedIn:  'Pendingin',   // default terbaik untuk mayoritas buah/sayur
   buyDate:   TODAY,      // default hari ini
   quantity:  '',
   imageUrl:  null,
@@ -89,7 +87,7 @@ export default function AddItemModal() {
 
   // Semua nama buah+sayur untuk input manual (tanpa kategori)
   const allItems = [
-    ...FRESH_ITEMS.Sayuran.map(n => ({ name: n, cat: 'Sayuran' })),
+    ...FRESH_ITEMS.Sayuran.map(n => ({ name: n, cat: 'Sayur' })),
     ...FRESH_ITEMS.Buah.map(n    => ({ name: n, cat: 'Buah'    })),
   ].sort((a, b) => a.name.localeCompare(b.name))
 
@@ -409,12 +407,20 @@ export default function AddItemModal() {
                 (default: hari ini)
               </span>
             </label>
-            <input
-              className="modal-input"
-              type="date"
-              value={form.buyDate}
-              max={TODAY}
-              onChange={e => set('buyDate', e.target.value)}
+            <DatePicker
+              className="modal-input" 
+              wrapperClassName="date-picker-wrapper" // <--- Tambahkan ini
+              selected={form.buyDate ? new Date(form.buyDate) : null}
+              maxDate={new Date()}
+              dateFormat="yyyy/MM/dd"
+              onChange={date => {
+                const formattedDate = date ? date.toISOString().split('T')[0] : '';
+                set('buyDate', formattedDate);
+              }}
+              // Gunakan fungsi customInput untuk merender input asli Anda
+              customInput={
+                <input className="modal-input" type="text" />
+              }
             />
           </div>
 

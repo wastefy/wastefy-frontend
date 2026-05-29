@@ -8,7 +8,7 @@
   --color-accent:         #5B8A47;
   --color-accent-hover:   #4E7A3C;
 
-  --color-bg-auth:        #3D5A36;
+  --color-bg-auth:        #2E4428;
   --color-bg-app:         #FFFFFF;
   --color-bg-input:       #E8E4DC;
   --color-bg-input-focus: #DDD9D1;
@@ -32,7 +32,7 @@
   --color-btn-edit:       #757575;
   --color-btn-addback:    #1565C0;
 
-  --color-navbar-bg:      #3D5A36;
+  --color-navbar-bg:      #2E4428;
   --color-navbar-icon:    rgba(200, 213, 190, 0.8);
   --color-navbar-active:  #FFFFFF;
 
@@ -48,10 +48,10 @@
 
 /* ---- Dark mode ---- */
 [data-theme="dark"] {
-  --color-bg-auth:        #1A2B17;
+  --color-bg-auth:        #2E4428;
   --color-bg-app:         #121212;
-  --color-bg-input:       #2A2A2A;
-  --color-bg-input-focus: #333333;
+  --color-bg-input:       #E8E4DC;
+  --color-bg-input-focus: #DDD9D1;
   --color-bg-empty:       #1E1E1E;
   --color-bg-card:        #1E1E1E;
   --color-bg-page:        #121212;
