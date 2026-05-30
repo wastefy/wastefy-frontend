@@ -11,7 +11,7 @@ export default function SignUpPage() {
 
   return (
     <div className="auth-screen">
-      <StatusBar variant="dark" />
+      {/* <StatusBar variant="dark" /> */}
 
       <div className="auth-body">
         <h1 className="auth-title">Daftar</h1>

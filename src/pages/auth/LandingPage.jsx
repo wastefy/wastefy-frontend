@@ -10,14 +10,13 @@ export default function LandingPage() {
 
   return (
     <div className="auth-screen">
-      <StatusBar variant="dark" />
+      {/* <StatusBar variant="dark" /> */}
 
       <div className="auth-body">
         <div className="auth-hero">
           <div className="auth-logo">
             <img src={logoImage} alt="Wastefy" className="auth-logo__image" />
           </div>
-
           <p className="auth-tagline">
             Pantau tanggal kadaluwarsa dan kurangi pemborosan makanan.
           </p>

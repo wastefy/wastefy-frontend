@@ -11,7 +11,7 @@ export default function SetPasswordPage() {
 
   return (
     <div className="auth-screen">
-      <StatusBar variant="dark" />
+      {/* <StatusBar variant="dark" /> */}
 
       <div className="auth-body">
         <div className="otp-icon">

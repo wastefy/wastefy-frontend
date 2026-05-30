@@ -12,7 +12,7 @@ export default function LoginPage() {
 
   return (
     <div className="auth-screen">
-      <StatusBar variant="dark" />
+      {/* <StatusBar variant="dark" /> */}
 
       <div className="auth-body">
         <h1 className="auth-title">Masuk</h1>

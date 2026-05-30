@@ -1,6 +1,6 @@
 import { useApp } from '../../context/AppContext'
 import { SCREENS, STOCK_STATUS } from '../../constants'
-import StatusBar from '../../components/layout/StatusBar'
+import NavBar from '../../components/layout/NavBar'
 import BottomNav from '../../components/layout/BottomNav'
 import StockCard from '../../components/stock/StockCard'
 import EmptyState from '../../components/common/EmptyState'
@@ -33,8 +33,7 @@ export default function HomePage() {
 
   return (
     <div className="app-screen">
-      <StatusBar variant="light" />
-
+      {/* <StatusBar variant="light" /> */}
       <div className="app-header">
         <h1 className="app-header__title">Stok Anda</h1>
         <button

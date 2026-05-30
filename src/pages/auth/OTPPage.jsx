@@ -25,7 +25,7 @@ export default function OTPPage() {
 
   return (
     <div className="auth-screen">
-      <StatusBar variant="dark" />
+      {/* <StatusBar variant="dark" /> */}
 
       <div className="auth-body" style={{ textAlign: 'center' }}>
         <div className="otp-icon">

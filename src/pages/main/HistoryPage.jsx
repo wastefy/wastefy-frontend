@@ -35,7 +35,7 @@ export default function HistoryPage() {
 
   return (
     <div className="app-screen">
-      <StatusBar variant="light" />
+      {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
         <h1 className="app-header__title">Riwayat</h1>

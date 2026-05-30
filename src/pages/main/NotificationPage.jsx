@@ -1,6 +1,6 @@
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
-import StatusBar from '../../components/layout/StatusBar'
+import NavBar from "../../components/layout/NavBar";
 import BottomNav from '../../components/layout/BottomNav'
 import EmptyState from '../../components/common/EmptyState'
 import { IconSettings } from '../../components/common/Icons'
@@ -11,7 +11,8 @@ export default function NotificationPage() {
 
   return (
     <div className="app-screen">
-      <StatusBar variant="light" />
+      {/* <StatusBar variant="light" /> */}
+      <NavBar />
 
       <div className="app-header">
         <h1 className="app-header__title">Notifikasi</h1>
@@ -47,9 +48,11 @@ export default function NotificationPage() {
                   className="notif-card__dot"
                   style={{
                     background:
-                      n.type === 'expired' ? 'var(--color-expired)'
-                      : n.type === 'soon'  ? 'var(--color-soon)'
-                      : 'var(--color-fresh)',
+                      n.type === "expired"
+                        ? "var(--color-expired)"
+                        : n.type === "soon"
+                          ? "var(--color-soon)"
+                          : "var(--color-fresh)",
                   }}
                 />
               </div>
@@ -60,5 +63,5 @@ export default function NotificationPage() {
 
       <BottomNav />
     </div>
-  )
+  );
 }

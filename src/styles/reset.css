@@ -2,9 +2,16 @@
 *::before,
 *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-html, body { height: 100%; width: 100%; }
+/* html, body { height: 100%; width: 100%; } */
 
-body {
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* body {
   font-family: var(--font-body);
   font-size: var(--fs-base);
   color: var(--color-text-dark);
@@ -15,14 +22,30 @@ body {
   min-height: 100vh;
   -webkit-font-smoothing: antialiased;
   transition: background var(--t-slow);
+} */
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--fs-base);
+  color: var(--color-text-dark);
+  background: var(--color-bg-app);
+  display: block;
+  -webkit-font-smoothing: antialiased;
+  transition: background var(--t-slow);
 }
 
 #root {
+  width: 100%;
+  min-height: 100vh;
+  padding: 0;
+}
+
+/* #root {
   display: flex;
   justify-content: center;
   width: 100%;
   padding: 20px 0;
-}
+} */
 
 button { cursor: pointer; border: none; outline: none; font-family: var(--font-body); background: none; }
 input, select, textarea { outline: none; font-family: var(--font-body); border: none; }

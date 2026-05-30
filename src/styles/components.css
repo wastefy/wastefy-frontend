@@ -1187,3 +1187,61 @@
   opacity: 0.8;
   font-style: italic;
 }
+
+/* NAVBAR */
+.desktop-navbar {
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .desktop-navbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    position: sticky;
+    top: 0;
+    z-index: 100;
+
+    width: 100%;
+    height: 72px;
+
+    padding: 0 32px;
+
+    background: var(--color-bg-app);
+    border-bottom: 1px solid var(--color-divider);
+  }
+
+  .desktop-navbar__brand {
+    font-size: 24px;
+    font-weight: 700;
+  }
+
+  .desktop-navbar__menu {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .desktop-navbar__item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    padding: 10px 16px;
+    border-radius: 12px;
+
+    color: var(--color-text-gray);
+
+    transition: all 0.2s ease;
+  }
+
+  .desktop-navbar__item:hover {
+    background: rgba(0,0,0,0.05);
+  }
+
+  .desktop-navbar__item--active {
+    background: var(--color-accent);
+    color: white;
+  }
+}

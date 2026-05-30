@@ -9,7 +9,7 @@ export default function ForgotPasswordPage() {
 
   return (
     <div className="auth-screen">
-      <StatusBar variant="dark" />
+      {/* <StatusBar variant="dark" /> */}
 
       <div className="auth-body">
         <h1 className="auth-title">Lupa Kata Sandi</h1>

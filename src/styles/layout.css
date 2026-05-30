@@ -1,9 +1,20 @@
-.phone-wrapper {
+/* .phone-wrapper {
   width: 390px;
   min-height: 844px;
   background: var(--color-bg-app);
   border-radius: 48px;
   box-shadow: var(--shadow-phone);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  transition: background var(--t-slow), box-shadow var(--t-slow);
+} */
+
+.phone-wrapper {
+  width: 100%;
+  min-height: 100dvh;
+  background: var(--color-bg-app);
   overflow: hidden;
   position: relative;
   display: flex;
@@ -16,7 +27,7 @@
 }
 
 /* app screen */
-.app-screen {
+/* .app-screen {
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -24,7 +35,19 @@
   min-height: 844px;
   position: relative;
   transition: background var(--t-slow);
+} */
+
+
+.app-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-bg-app);
+  max-height: 100%
+  position: relative;
+  transition: background var(--t-slow);
 }
+
 
 /* header */
 .app-header {
@@ -60,11 +83,17 @@
 .app-header__icon-btn:hover { opacity: 0.6; }
 
 /* content */
-.app-content {
+/* .app-content {
   flex: 1;
   padding: 0 var(--sp-4) 110px;
   overflow-y: auto;
   max-height: 700px;
+} */
+.app-content {
+  flex: 1;
+  padding: 0 var(--sp-4) 110px;
+  overflow-y: auto;
+  max-height: none;
 }
 
 /* bottom nav */

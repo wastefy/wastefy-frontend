@@ -37,7 +37,7 @@ export default function EditProfilePage() {
 
   return (
     <div className="app-screen">
-      <StatusBar variant="light" />
+      {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
         <div className="app-header__back-row">

@@ -13,7 +13,7 @@ export default function NotifSettingsPage() {
 
   return (
     <div className="app-screen">
-      <StatusBar variant="light" />
+      {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
         <div className="app-header__back-row">
