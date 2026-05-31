@@ -1,17 +1,14 @@
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
-import StatusBar from '../../components/layout/StatusBar'
 
 export default function ForgotPasswordPage() {
   const { navigate } = useApp()
   const [email, setEmail] = useState('')
 
   return (
-    <div className="auth-screen">
-      {/* <StatusBar variant="dark" /> */}
-
-      <div className="auth-body">
+    <div className="auth-screen auth-screen--centered">
+      <div className="auth-body auth-body--centered">
         <h1 className="auth-title">Lupa Kata Sandi</h1>
         <p className="auth-subtitle">
           Masukkan alamat email Anda untuk menerima tautan reset dan memulihkan
@@ -29,11 +26,7 @@ export default function ForgotPasswordPage() {
           />
         </div>
 
-        <button
-          className="btn btn--primary"
-          style={{ marginTop: 8 }}
-          onClick={() => navigate(SCREENS.OTP)}
-        >
+        <button className="btn btn--primary" onClick={() => navigate(SCREENS.OTP)}>
           Lanjutkan
         </button>
       </div>

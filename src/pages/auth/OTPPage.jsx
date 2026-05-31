@@ -1,8 +1,7 @@
 import { useState, useRef } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
-import StatusBar from '../../components/layout/StatusBar'
-import logoImage from '../../assets/images/icon-enter otp.png'
+import otpIcon from '../../assets/images/icon-enter otp.png'
 
 export default function OTPPage() {
   const { navigate } = useApp()
@@ -24,12 +23,10 @@ export default function OTPPage() {
   }
 
   return (
-    <div className="auth-screen">
-      {/* <StatusBar variant="dark" /> */}
-
-      <div className="auth-body" style={{ textAlign: 'center' }}>
-        <div className="otp-icon">
-          <img src={logoImage} alt="Enter OTP" className="otp-icon__image" />
+    <div className="auth-screen auth-screen--centered">
+      <div className="auth-body auth-body--centered">
+        <div className="auth-page-icon">
+          <img src={otpIcon} alt="OTP" className="auth-page-icon__img" />
         </div>
 
         <h1 className="auth-title">Masukkan Kode OTP</h1>
@@ -53,15 +50,12 @@ export default function OTPPage() {
           ))}
         </div>
 
-        <button
-          className="btn btn--primary"
-          onClick={() => navigate(SCREENS.SET_PASSWORD)}
-        >
+        <button className="btn btn--primary" onClick={() => navigate(SCREENS.SET_PASSWORD)}>
           Verifikasi Kode
         </button>
 
         <p className="otp-resend">
-          Tidak menerima OTP? <a>Kirim Ulang</a>
+          Tidak menerima OTP? <a onClick={() => { }}>Kirim Ulang</a>
         </p>
       </div>
     </div>

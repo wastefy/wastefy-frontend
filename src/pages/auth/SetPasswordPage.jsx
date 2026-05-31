@@ -1,21 +1,18 @@
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
-import StatusBar from '../../components/layout/StatusBar'
-import logoImage from '../../assets/images/icon-set new password.png'
+import setPasswordIcon from '../../assets/images/icon-set new password.png'
 
 export default function SetPasswordPage() {
   const { navigate } = useApp()
-  const [password, setPassword]   = useState('')
-  const [confirm, setConfirm]     = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
 
   return (
-    <div className="auth-screen">
-      {/* <StatusBar variant="dark" /> */}
-
-      <div className="auth-body">
-        <div className="otp-icon">
-          <img src={logoImage} alt="Set New Password" className="otp-icon__image" />
+    <div className="auth-screen auth-screen--centered">
+      <div className="auth-body auth-body--centered">
+        <div className="auth-page-icon">
+          <img src={setPasswordIcon} alt="Set Password" className="auth-page-icon__img" />
         </div>
 
         <h1 className="auth-title">Atur Kata Sandi Baru</h1>
@@ -45,11 +42,7 @@ export default function SetPasswordPage() {
           />
         </div>
 
-        <button
-          className="btn btn--primary"
-          style={{ marginTop: 8 }}
-          onClick={() => navigate(SCREENS.HOME)}
-        >
+        <button className="btn btn--primary" onClick={() => navigate(SCREENS.HOME)}>
           Atur Ulang Kata Sandi
         </button>
       </div>
