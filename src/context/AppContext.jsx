@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect } from 'react'
-import { SCREENS, TABS } from '../constants'
+import { SCREENS, TABS, BASE_URL } from '../constants'
+import axios from 'axios'
 
 const AppContext = createContext(null)
 
@@ -16,18 +17,8 @@ export function AppProvider({ children }) {
   const [successModalOpen, setSuccessModalOpen] = useState(false)
   const [darkMode, setDarkMode]         = useState(false)
   const [notifSetting, setNotifSetting] = useState('allow')
-  const [profile, setProfile] = useState({
-    name: 'Your Name', email: 'yourname@gmail.com',
-    avatarUrl: null, linkedGoogle: false,
-  })
-  const [selectedItem, setSelectedItem] = useState(null)
-
-  const updateProfile = (fields) => setProfile((prev) => ({ ...prev, ...fields }))
-
-  useEffect(() => {
-    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
-  }, [darkMode])
-
+  const [authLoading, setAuthLoading] = useState(false)
+  
   const navigate = (to) => { setPrevScreen(screen); setScreen(to) }
   const goBack = () => {
     if (prevScreen) { setScreen(prevScreen); setPrevScreen(null) }
@@ -38,10 +29,76 @@ export function AppProvider({ children }) {
     navigate({ home: SCREENS.HOME, notification: SCREENS.NOTIFICATION, history: SCREENS.HISTORY }[tab])
   }
 
+  const [profile, setProfile] = useState({
+    name: 'Your Name', email: 'yourname@gmail.com',
+    avatarUrl: null, linkedGoogle: false,
+  })
+
+  const registerUser = async (nama, email, password) => {
+    setLoading(true);
+    try {
+      const response = await axios.post(`${BASE_URL}/api/auth/register`, {
+        nama,     
+        email,
+        password
+      });
+      
+      setLoading(false);
+      return { success: true, data: response.data };
+    } catch (error) {
+      setLoading(false);
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Registrasi gagal. Silakan coba lagi.' 
+      };
+    }
+  }
+
+  const [selectedItem, setSelectedItem] = useState(null)
+
+  const updateProfile = (fields) => setProfile((prev) => ({ ...prev, ...fields }))
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
+
   const openItemDetail = (item) => {
     setSelectedItem(item)
     navigate(SCREENS.ITEM_DETAIL)
   }
+
+  const [inventorySummary, setInventorySummary] = useState(null);
+
+  const fetchStocks = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/api/inventory`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setStocks(response.data);
+    } catch (error) {
+      console.error('Error fetching stocks:', error);
+    }
+  }
+
+  const fetchInventorySummary = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(`${BASE_URL}/api/inventory/summary`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setInventorySummary(response.data);
+    } catch (error) {
+      console.error('Error fetching inventory summary:', error);
+    }
+  }
+
+  useEffect(() => {
+    if (screen === SCREENS.HOME) {
+      fetchStocks();
+      fetchInventorySummary();
+    }
+  }, [screen]);
 
   const addStock = (item) => {
     const newItem = {
@@ -77,18 +134,30 @@ export function AppProvider({ children }) {
     }, ...prev])
   }
 
-  const markUsed = (id) => {
-    const item = stocks.find((s) => s.id === id)
-    if (!item) return
-    setHistory((prev) => [{ ...item, id: Date.now(), status: 'used', date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }, ...prev])
-    setStocks((prev) => prev.filter((s) => s.id !== id))
-  }
+  const markUsed = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${BASE_URL}/api/inventory/${id}/used`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-  const throwAway = (id) => {
-    const item = stocks.find((s) => s.id === id)
-    if (!item) return
-    setHistory((prev) => [{ ...item, id: Date.now(), status: 'wasted', isExpired: item.status === 'expired', date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) }, ...prev])
-    setStocks((prev) => prev.filter((s) => s.id !== id))
+      fetchStocks();
+    } catch (error) {
+      alert('Gagal menandai item sebagai terpakai. Silakan coba lagi.')
+    }
+  }
+  
+  const throwAway = async (id) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${BASE_URL}/api/inventory/${id}/wasted`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+
+      fetchStocks();
+    } catch (error) {
+      alert('Gagal menandai item sebagai dibuang. Silakan coba lagi.')
+    }
   }
 
   const addBackToStock = (histId) => {
@@ -97,6 +166,7 @@ export function AppProvider({ children }) {
     setStocks((prev) => [{ ...item, id: Date.now(), status: 'fresh' }, ...prev])
     setHistory((prev) => prev.filter((h) => h.id !== histId))
   }
+
 
   const value = {
     screen, navigate, goBack,
@@ -111,6 +181,8 @@ export function AppProvider({ children }) {
     profile, updateProfile,
     selectedItem, openItemDetail,
     setStocks,
+    registerUser,
+    authLoading,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

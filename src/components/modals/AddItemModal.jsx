@@ -6,25 +6,10 @@ import {
   FRESH_ITEMS,
   CONDITION_OPTIONS,
   STORAGE_LOCATIONS,
-  AI_DETECT_PROMPT,
-  estimateShelfLife,
+  BASE_URL,
 } from '../../constants'
 
-/* ── Helpers ── */
-const EMOJI_MAP = {
-  Sayuran: '🥬', Buah: '🍎',
-}
-
 const TODAY = new Date().toISOString().split('T')[0]
-
-function fileToBase64(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader()
-    reader.onload  = () => resolve(reader.result.split(',')[1])
-    reader.onerror = reject
-    reader.readAsDataURL(file)
-  })
-}
 
 function daysToStatus(days) {
   if (days <= 0) return 'expired'
@@ -38,7 +23,6 @@ function calcExpiryDate(days) {
   return d.toISOString().split('T')[0]
 }
 
-/* Tebak jenis sayur/buah dari nama item */
 function guessCategory(name) {
   if (!name) return ''
   const lower = name.toLowerCase()
@@ -61,7 +45,7 @@ const BLANK = {
 }
 
 export default function AddItemModal() {
-  const { setAddModalOpen, addStock } = useApp()
+  const { setAddModalOpen, addStock, fetchStocks = () => {}, setSuccessModalOpen = () => {} } = useApp()
 
   const [form, setForm]                 = useState(BLANK)
   const set = (k, v)                    => setForm((p) => ({ ...p, [k]: v }))
@@ -72,14 +56,15 @@ export default function AddItemModal() {
 
   const conditionOptions = form.category ? (CONDITION_OPTIONS[form.category] ?? []) : []
 
+  // SINKRONISASI AMAN: Memastikan data constants tidak memicu crash jika kosong
   const allItems = [
-    ...FRESH_ITEMS.Sayuran.map(n => ({ name: n, cat: 'Sayur' })),
-    ...FRESH_ITEMS.Buah.map(n    => ({ name: n, cat: 'Buah'    })),
+    ...(FRESH_ITEMS?.Sayur ? FRESH_ITEMS.Sayur.map(n => ({ name: n, cat: 'Sayur' })) : []),
+    ...(FRESH_ITEMS?.Buah ? FRESH_ITEMS.Buah.map(n => ({ name: n, cat: 'Buah' })) : []),
   ].sort((a, b) => a.name.localeCompare(b.name))
 
-  const estimation = (form.name && form.condition && form.storedIn)
-    ? estimateShelfLife(form.name, form.condition, form.storedIn, form.category)
-    : null
+  const estimation = aiResult?.estimated_days 
+    ? { days: aiResult.estimated_days, note: aiResult.note || null } 
+    : null;
 
   const handleNameChange = (name) => {
     const cat = guessCategory(name)
@@ -94,42 +79,40 @@ export default function AddItemModal() {
     setAiResult(null)
 
     try {
-      const base64 = await fileToBase64(file)
-      const res = await fetch('https://api.anthropic.com/v1/messages', {
+      const formData = new FormData()
+      formData.append('file_foto', file)
+
+      const token = localStorage.getItem('token')
+
+      const res = await fetch(`${BASE_URL}/api/inventory/detect`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 300,
-          messages: [{
-            role: 'user',
-            content: [
-              { type: 'image', source: { type: 'base64', media_type: file.type, data: base64 } },
-              { type: 'text',  text: AI_DETECT_PROMPT },
-            ],
-          }],
-        }),
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData,
       })
 
-      const data   = await res.json()
-      const raw    = data.content?.[0]?.text ?? ''
-      const clean  = raw.replace(/```json|```/g, '').trim()
-      const result = JSON.parse(clean)
+      const result = await res.json()
 
-      if (!result.type) { setAiState('not_produce'); return }
+      if (!res.ok || !result.type) {
+        setAiState('not_produce')
+        return
+      }
 
       setAiResult(result)
       setAiState('done')
 
+      // Perbaikan typo "detctedCategory"
+      let detectedCategory = result.type
+      if (detectedCategory === 'Sayuran') detectedCategory = 'Sayur'
+
       setForm(p => ({
         ...p,
         name:      result.name      ?? p.name,
-        category:  result.type      ?? p.category,
+        category:  detectedCategory ?? p.category,
         condition: result.condition ?? p.condition,
       }))
 
     } catch (err) {
-      console.error(err)
+      console.error('Error saat melakukan scan gambar', err)
       setAiState('error')
     }
   }, [])
@@ -140,32 +123,83 @@ export default function AddItemModal() {
     setAiResult(null)
   }
 
-  const handleSubmit = () => {
-    if (!form.name || !form.category || !form.condition) return
-    const condObj = conditionOptions.find(c => c.value === form.condition)
-    if (condObj?.multiplier === 0) { setRotten(true); return }
-    doAddStock()
+  const handleSubmit = async () => {
+    if (!form.name || !form.category || !form.condition) {
+      alert('Mohon lengkapi data item terlebih dahulu.');
+      return;
+    } 
+
+    // Intersepsi jika kondisinya busuk/Busuk, arahkan ke modal konfirmasi
+    if (form.condition.toLowerCase() === 'busuk') {
+      setRotten(true);
+      return;
+    }
+
+    await executeSubmit();
+  }
+
+  // Fungsi isolasi untuk eksekusi kirim data ke API backend
+  const executeSubmit = async () => {
+    try {
+      const token = localStorage.getItem('token')
+
+      const dataPayload = {
+        nama_item: form.name,
+        jenis_item: form.category,
+        kondisi_fisik: form.condition,
+        lokasi_penyimpanan: form.storedIn,
+        tanggal_beli: form.buyDate,
+      }
+
+      const res = await fetch(`${BASE_URL}/api/inventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`,
+        },
+        body: JSON.stringify(dataPayload),
+      })
+
+      // PERBAIKAN LOGIKA: Jika response SUKSES (res.ok)
+      if (res.ok) {
+        if (typeof fetchStocks === 'function') fetchStocks(); 
+
+        doAddStock();
+
+        setAddModalOpen(false);
+        if (typeof setSuccessModalOpen === 'function') { 
+          setSuccessModalOpen(true);
+        }
+      } else {
+        const errorData = await res.json().catch(() => ({}));
+        alert(`Gagal menambahkan item: ${errorData.message || 'Terjadi kesalahan server.'}`)
+      }
+    } catch (error) {
+      console.error('Error submit inventory', error)
+      alert('Terjadi kesalahan jaringan saat menambahkan item. Silakan coba lagi.')
+    }
   }
 
   const doAddStock = () => {
     const condObj = conditionOptions.find(c => c.value === form.condition)
     const est     = estimation ?? { days: 3, note: null }
-    addStock({
-      name:            form.name,
-      category:        form.category,
-      itemType:        'fresh',
-      quantity:        form.quantity,
-      storedIn:        form.storedIn,
-      buyDate:         form.buyDate,
-      imageUrl:        form.imageUrl,
-      emoji:           EMOJI_MAP[form.category] ?? '🥗',
-      condition:       form.condition,
-      conditionLabel:  condObj?.label ?? form.condition,
-      estimatedExpiry: calcExpiryDate(est.days),
-      shelfDays:       est.days,
-      aiConfidence:    aiResult?.confidence ?? null,
-      status:          daysToStatus(est.days),
-    })
+    if (typeof addStock === 'function') {
+      addStock({
+        name:            form.name,
+        category:        form.category,
+        itemType:        'fresh',
+        quantity:        form.quantity || 1,
+        storedIn:        form.storedIn,
+        buyDate:         form.buyDate,
+        imageUrl:        form.imageUrl,
+        condition:       form.condition,
+        conditionLabel:  condObj?.label ?? form.condition,
+        estimatedExpiry: calcExpiryDate(est.days),
+        shelfDays:       est.days,
+        aiConfidence:    aiResult?.confidence ?? null,
+        status:          daysToStatus(est.days),
+      })
+    }
   }
 
   if (showRottenConfirm) return (
@@ -182,7 +216,7 @@ export default function AddItemModal() {
           <div style={{ display: 'flex', gap: 'var(--sp-3)' }}>
             <button className="btn btn--outline" style={{ flex: 1 }} onClick={() => setRotten(false)}>Batal</button>
             <button className="btn btn--primary" style={{ flex: 1, background: 'var(--color-btn-throw)' }}
-              onClick={() => { setRotten(false); doAddStock() }}>Tetap Tambah</button>
+              onClick={() => { setRotten(false); executeSubmit(); }}>Tetap Tambah</button>
           </div>
         </div>
       </div>
@@ -237,8 +271,8 @@ export default function AddItemModal() {
               <div className="add-ai-banner add-ai-banner--done">
                 <span>✅</span>
                 <div style={{ flex: 1 }}>
-                  <strong>{aiResult.name}</strong> · {aiResult.type} ·{' '}
-                  kondisi <strong>{CONDITION_OPTIONS[aiResult.type]?.find(c => c.value === aiResult.condition)?.label ?? aiResult.condition}</strong>
+                  <strong>{aiResult.name}</strong> · {form.category} ·{' '}
+                  kondisi <strong>{CONDITION_OPTIONS[form.category]?.find(c => c.value === aiResult.condition)?.label ?? aiResult.condition}</strong>
                   {aiResult.confidence < 0.6 && (
                     <span className="add-ai-low-conf"> · Deteksi kurang yakin, periksa di bawah</span>
                   )}
@@ -269,7 +303,7 @@ export default function AddItemModal() {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 'var(--sp-4)', marginTop: 'var(--sp-3)' }}>
 
-          {/* 1. Nama item — dari AI atau pilih manual */}
+          {/* Nama item */}
           <div className="modal-form-group">
             <label className="modal-label">Nama item</label>
             <select
@@ -280,19 +314,18 @@ export default function AddItemModal() {
               <option value="">
                 {aiState === 'loading' ? 'AI sedang mendeteksi...' : 'Pilih atau tunggu deteksi AI'}
               </option>
-              {allItems.map(({ name, cat }) => (
+              {allItems.map(({ name }) => (
                 <option key={name} value={name}>{name}</option>
               ))}
             </select>
 
-            {/* 2. Jenis item — otomatis dari nama, tampil sebagai label kecil */}
+            {/* Jenis item */}
             {form.category && (
               <div style={{
                 marginTop: 'var(--sp-1)',
                 display: 'flex', alignItems: 'center', gap: 4,
                 fontSize: 'var(--fs-xs)', color: 'var(--color-text-muted)',
               }}>
-                <span>{EMOJI_MAP[form.category]}</span>
                 <span>Jenis: <strong style={{ color: 'var(--color-text-dark)' }}>{form.category}</strong></span>
                 {aiState === 'done' && (
                   <span style={{
@@ -305,7 +338,7 @@ export default function AddItemModal() {
             )}
           </div>
 
-          {/* 5. Kondisi fisik — dari AI atau pilih manual */}
+          {/* Kondisi fisik */}
           <div className="modal-form-group">
             <label className="modal-label">Kondisi fisik</label>
             <select
@@ -343,7 +376,7 @@ export default function AddItemModal() {
           </div>
 
           {/* Estimasi real-time */}
-          {estimation && form.condition !== 'busuk' && (
+          {estimation && form.condition.toLowerCase() !== 'busuk' && (
             <div className={`add-estimation ${estimation.days <= 2 ? 'add-estimation--warn' : 'add-estimation--ok'}`}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                 <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
@@ -354,18 +387,16 @@ export default function AddItemModal() {
               </div>
             </div>
           )}
-          {form.condition === 'busuk' && (
+          {form.condition.toLowerCase() === 'busuk' && (
             <div className="add-estimation add-estimation--rotten">
               <span>⚠️</span>
               <span>Item ini terdeteksi <strong>busuk</strong> — pertimbangkan untuk tidak menyimpannya</span>
             </div>
           )}
 
-          {/* 3. Lokasi simpan — default Kulkas */}
+          {/* Lokasi simpan */}
           <div className="modal-form-group">
-            <label className="modal-label">
-              Lokasi simpan
-            </label>
+            <label className="modal-label">Lokasi simpan</label>
             <select
               className="modal-select"
               value={form.storedIn}
@@ -375,7 +406,7 @@ export default function AddItemModal() {
             </select>
           </div>
 
-          {/* 4. Tanggal beli — default hari ini */}
+          {/* Tanggal beli */}
           <div className="modal-form-group">
             <label className="modal-label">
               Tanggal beli
@@ -385,7 +416,7 @@ export default function AddItemModal() {
             </label>
             <DatePicker
               className="modal-input" 
-              wrapperClassName="date-picker-wrapper" // <--- Tambahkan ini
+              wrapperClassName="date-picker-wrapper"
               selected={form.buyDate ? new Date(form.buyDate) : null}
               maxDate={new Date()}
               dateFormat="yyyy/MM/dd"
@@ -393,7 +424,6 @@ export default function AddItemModal() {
                 const formattedDate = date ? date.toISOString().split('T')[0] : '';
                 set('buyDate', formattedDate);
               }}
-              // Gunakan fungsi customInput untuk merender input asli Anda
               customInput={
                 <input className="modal-input" type="text" />
               }
