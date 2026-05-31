@@ -1,7 +1,5 @@
 import { useApp } from '../../context/AppContext'
 import { SCREENS, STOCK_STATUS } from '../../constants'
-import NavBar from '../../components/layout/NavBar'
-import BottomNav from '../../components/layout/BottomNav'
 import StockCard from '../../components/stock/StockCard'
 import EmptyState from '../../components/common/EmptyState'
 import AddItemModal from '../../components/modals/AddItemModal'
@@ -79,7 +77,6 @@ export default function HomePage() {
       {addModalOpen    && <AddItemModal />}
       {successModalOpen && <SuccessModal />}
 
-      <BottomNav />
     </div>
   )
 }

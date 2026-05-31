@@ -1,5 +1,7 @@
 import { useApp } from './context/AppContext'
 import { SCREENS } from './constants'
+import DesktopNavbar from './components/layout/NavBar'
+import BottomNav from './components/layout/BottomNav'
 
 import LandingPage        from './pages/auth/LandingPage'
 import LoginPage          from './pages/auth/LoginPage'
@@ -34,9 +36,25 @@ const PAGE_MAP = {
 
 export default function App() {
   const { screen } = useApp()
+
+  const isMainScreen = [
+    SCREENS.HOME,
+    SCREENS.NOTIFICATION,
+    SCREENS.HISTORY,
+    SCREENS.SETTINGS,
+    SCREENS.NOTIF_SETTINGS,
+    SCREENS.EDIT_PROFILE,
+    SCREENS.ITEM_DETAIL
+  ].includes(screen)
+
   return (
+    <div className="app-container">
+      {isMainScreen && <DesktopNavbar />}
+
     <div className="phone-wrapper">
       {PAGE_MAP[screen] ?? <LandingPage />}
+      {isMainScreen && <BottomNav />}
     </div>
+  </div>
   )
 }
