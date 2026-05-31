@@ -1,13 +1,34 @@
-import { useState } from 'react'
+import { createContext, useState } from 'react'
 import { useApp } from '../../context/AppContext'
-import { SCREENS } from '../../constants'
+import { SCREENS, BASE_URL } from '../../constants'
 import StatusBar from '../../components/layout/StatusBar'
+import axios from 'axios'
 
 export default function SignUpPage() {
-  const { navigate } = useApp()
+  const { navigate, registerUser, authLoading } = useApp()
   const [name, setName]         = useState('')
   const [email, setEmail]       = useState('')
   const [password, setPassword] = useState('')
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleSignUpSubmit = async (e) => {
+    e.preventDefault()
+    setErrorMessage('')
+
+    if (!name || !email || !password) {
+      setErrorMessage('Semua field harus diisi.')
+      return
+    }
+
+    const result = await registerUser(name, email, password)
+
+    if (result.success) {
+      alert('Registrasi berhasil! Silakan masuk dengan akun Anda.')
+      navigate(SCREENS.LOGIN)
+    } else {
+      setErrorMessage(result.message)
+    }
+  }
 
   return (
     <div className="auth-screen">
@@ -19,6 +40,12 @@ export default function SignUpPage() {
           Buat akun untuk memulai pencatatan stok anda.
         </p>
 
+          <div style={{ color: '#ff4d4d', marginBottom: 16, fontSize: '14px', fontWeight: '500' }}>
+            {errorMessage}
+          </div>
+        
+      <form onSubmit={handleSignUpSubmit}>
+
         <div className="form-group">
           <label className="form-label">Nama</label>
           <input
@@ -27,6 +54,7 @@ export default function SignUpPage() {
             placeholder="Masukkan nama lengkap Anda"
             value={name}
             onChange={(e) => setName(e.target.value)}
+            required
           />
         </div>
 
@@ -38,6 +66,7 @@ export default function SignUpPage() {
             placeholder="Masukkan email Anda"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            required
           />
         </div>
 
@@ -49,16 +78,19 @@ export default function SignUpPage() {
             placeholder="Masukkan kata sandi Anda"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
           />
         </div>
 
         <button
           className="btn btn--primary"
+          type="submit"
           style={{ marginTop: 8 }}
-          onClick={() => navigate(SCREENS.HOME)}
+          disabled={authLoading}
         >
           Daftar
         </button>
+      </form>
 
         <p className="auth-footer-link">
           Sudah punya akun?{' '}
