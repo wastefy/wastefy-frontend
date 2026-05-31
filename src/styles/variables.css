@@ -49,8 +49,8 @@
 [data-theme="dark"] {
   --color-bg-auth:        #2E4428;
   --color-bg-app:         #121212;
-  --color-bg-input:       #E8E4DC;
-  --color-bg-input-focus: #DDD9D1;
+  --color-bg-input:       #2A2A2A;
+  --color-bg-input-focus: #3a3a3a;
   --color-bg-empty:       #1E1E1E;
   --color-bg-card:        #1E1E1E;
   --color-bg-page:        #121212;
