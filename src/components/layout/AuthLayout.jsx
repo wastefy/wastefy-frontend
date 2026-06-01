@@ -5,7 +5,7 @@ export default function AuthLayout({ children }) {
         <div className="auth-screen">
 
             {/* Panel kiri – branding (tablet/desktop only) */}
-            <div className="auth-panel auth-panel--brand">
+            <div className="auth-panel--brand">
                 <div className="auth-brand">
                     <img src={logoImage} alt="Wastefy" className="auth-brand__logo" />
                     <p className="auth-brand__tagline">
@@ -15,7 +15,7 @@ export default function AuthLayout({ children }) {
             </div>
 
             {/* Panel kanan – form */}
-            <div className="auth-panel auth-panel--form">
+            <div className="auth-panel--form">
                 {/* Logo mobile only */}
                 <div className="auth-mobile-logo">
                     <img src={logoImage} alt="Wastefy" className="auth-logo__image" />
