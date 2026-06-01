@@ -1,4 +1,4 @@
-export const BASE_URL = 'https://wastefy-backend-oitwo1x9n-wastefy-project-dicoding.vercel.app';
+export const BASE_URL = 'https://wastefy-backend-git-dev-wastefy-project-dicoding.vercel.app';
 
 export const SCREENS = {
   LANDING:        'landing',
@@ -23,9 +23,9 @@ export const TABS = {
 }
 
 export const STOCK_STATUS = {
-  FRESH:   'Segar',
-  SOON:    'Segera',
-  EXPIRED: 'Kadaluarsa',
+  FRESH:   'fresh',
+  SOON:    'soon',
+  EXPIRED: 'expired',
 }
 
 export const HISTORY_STATUS = {

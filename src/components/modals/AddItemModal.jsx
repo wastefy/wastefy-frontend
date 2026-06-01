@@ -2,11 +2,11 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { useState, useRef, useCallback } from 'react'
 import { useApp } from '../../context/AppContext'
+import api from '../../utils/axiosInstance' 
 import {
   FRESH_ITEMS,
   CONDITION_OPTIONS,
   STORAGE_LOCATIONS,
-  BASE_URL,
 } from '../../constants'
 
 const TODAY = new Date().toISOString().split('T')[0]
@@ -56,7 +56,6 @@ export default function AddItemModal() {
 
   const conditionOptions = form.category ? (CONDITION_OPTIONS[form.category] ?? []) : []
 
-  // SINKRONISASI AMAN: Memastikan data constants tidak memicu crash jika kosong
   const allItems = [
     ...(FRESH_ITEMS?.Sayur ? FRESH_ITEMS.Sayur.map(n => ({ name: n, cat: 'Sayur' })) : []),
     ...(FRESH_ITEMS?.Buah ? FRESH_ITEMS.Buah.map(n => ({ name: n, cat: 'Buah' })) : []),
@@ -82,17 +81,13 @@ export default function AddItemModal() {
       const formData = new FormData()
       formData.append('file_foto', file)
 
-      const token = localStorage.getItem('token')
-
-      const res = await fetch(`${BASE_URL}/api/inventory/detect`, {
-        method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
-        body: formData,
+      const response = await api.post('/api/inventory/detect', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
       })
 
-      const result = await res.json()
+      const result = response.data
 
-      if (!res.ok || !result.type) {
+      if (!result.type) {
         setAiState('not_produce')
         return
       }
@@ -100,7 +95,6 @@ export default function AddItemModal() {
       setAiResult(result)
       setAiState('done')
 
-      // Perbaikan typo "detctedCategory"
       let detectedCategory = result.type
       if (detectedCategory === 'Sayuran') detectedCategory = 'Sayur'
 
@@ -112,7 +106,7 @@ export default function AddItemModal() {
       }))
 
     } catch (err) {
-      console.error('Error saat melakukan scan gambar', err)
+      console.error('Error saat melakukan scan gambar:', err)
       setAiState('error')
     }
   }, [])
@@ -129,7 +123,6 @@ export default function AddItemModal() {
       return;
     } 
 
-    // Intersepsi jika kondisinya busuk/Busuk, arahkan ke modal konfirmasi
     if (form.condition.toLowerCase() === 'busuk') {
       setRotten(true);
       return;
@@ -138,11 +131,8 @@ export default function AddItemModal() {
     await executeSubmit();
   }
 
-  // Fungsi isolasi untuk eksekusi kirim data ke API backend
   const executeSubmit = async () => {
     try {
-      const token = localStorage.getItem('token')
-
       const dataPayload = {
         nama_item: form.name,
         jenis_item: form.category,
@@ -151,17 +141,10 @@ export default function AddItemModal() {
         tanggal_beli: form.buyDate,
       }
 
-      const res = await fetch(`${BASE_URL}/api/inventory`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`,
-        },
-        body: JSON.stringify(dataPayload),
-      })
+      const response = await api.post('/api/inventory', dataPayload)
 
-      // PERBAIKAN LOGIKA: Jika response SUKSES (res.ok)
-      if (res.ok) {
+
+      if (response.status === 200 || response.status === 201) {
         if (typeof fetchStocks === 'function') fetchStocks(); 
 
         doAddStock();
@@ -170,13 +153,11 @@ export default function AddItemModal() {
         if (typeof setSuccessModalOpen === 'function') { 
           setSuccessModalOpen(true);
         }
-      } else {
-        const errorData = await res.json().catch(() => ({}));
-        alert(`Gagal menambahkan item: ${errorData.message || 'Terjadi kesalahan server.'}`)
       }
     } catch (error) {
-      console.error('Error submit inventory', error)
-      alert('Terjadi kesalahan jaringan saat menambahkan item. Silakan coba lagi.')
+      console.error('Error submit inventory:', error)
+      const errorMsg = error.response?.data?.message || 'Terjadi kesalahan jaringan saat menambahkan item.'
+      alert(`Gagal menambahkan item: ${errorMsg}`)
     }
   }
 

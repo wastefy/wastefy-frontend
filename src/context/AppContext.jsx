@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
 import axios from 'axios'
+import api from '../utils/axiosInstance'
+import { signInWithEmailAndPassword } from 'firebase/auth' // getAuth dibersihkan dari sini
+import { auth } from '../config/firebase'
 
 const AppContext = createContext(null)
 
@@ -34,28 +37,57 @@ export function AppProvider({ children }) {
     avatarUrl: null, linkedGoogle: false,
   })
 
-  const registerUser = async (nama, email, password) => {
-    setLoading(true);
+  const registerUser = async (name, email, password) => {
     try {
-      const response = await axios.post(`${BASE_URL}/api/auth/register`, {
-        nama,     
+      setAuthLoading(true);
+      const response = await api.patch('/api/auth/register', {
+        name, 
         email,
         password
       });
       
-      setLoading(false);
-      return { success: true, data: response.data };
+      if (response.data.success) {
+        return { success: true, message: response.data.message || 'Pendaftaran berhasil.' };
+      }
     } catch (error) {
-      setLoading(false);
-      return { 
-        success: false, 
-        message: error.response?.data?.message || 'Registrasi gagal. Silakan coba lagi.' 
-      };
+      const errorMessage = error.response?.data?.message || 'Terjadi kesalahan pada server saat registrasi.';
+      return { success: false, message: errorMessage };
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  const loginUser = async (email, password) => {
+    try {
+      setAuthLoading(true)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
+
+      const token = await user.getIdToken()
+      localStorage.setItem('token', token) 
+
+      setProfile((prev) => ({
+        ...prev,
+        email: user.email,
+        name: user.displayName || prev.name
+      }))
+
+      return { success: true, user }
+    } catch (error) {
+      console.error("Firebase Auth Error:", error)
+      let errorMessage = error.message || 'Gagal masuk. Periksa kembali jaringan atau kredensial Anda.'
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = 'Email atau kata sandi salah.'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Format email tidak valid.'
+      }
+      return { success: false, message: errorMessage }
+    } finally {
+      setAuthLoading(false)
     }
   }
 
   const [selectedItem, setSelectedItem] = useState(null)
-
   const updateProfile = (fields) => setProfile((prev) => ({ ...prev, ...fields }))
 
   useEffect(() => {
@@ -69,13 +101,26 @@ export function AppProvider({ children }) {
 
   const [inventorySummary, setInventorySummary] = useState(null);
 
+  const mapItem = (raw) => ({
+    id:             raw.id,
+    name:           raw.nama_item,
+    condition:      raw.kondisi_fisik,
+    conditionLabel: raw.kondisi_fisik,
+    storedIn:       raw.lokasi_penyimpanan,
+    buyDate:        raw.tanggal_beli,
+    status:         raw.status?.toLowerCase(),   
+    category:       raw.jenis_item ??raw.kategori ?? raw.category ?? 'Lainnya',
+    imageUrl:       raw.foto_url ?? raw.imageUrl ?? null,
+    shelfDays:      raw.sisa_hari ?? raw.shelf_days ?? null,
+  })
+
   const fetchStocks = async () => {
     try {
       const token = localStorage.getItem('token');
       const response = await axios.get(`${BASE_URL}/api/inventory`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      setStocks(response.data);
+      setStocks((response.data.items || []).map(mapItem));
     } catch (error) {
       console.error('Error fetching stocks:', error);
     }
@@ -93,54 +138,97 @@ export function AppProvider({ children }) {
     }
   }
 
+  const fetchHistory = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`${BASE_URL}/api/inventory/history`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const raw = response.data.history || response.data.items || []
+      setHistory(raw.map(item => ({
+        id:             item.id ?? item._id,
+        name:           item.nama_item,
+        condition:      item.kondisi_fisik,
+        conditionLabel: item.kondisi_fisik,
+        storedIn:       item.lokasi_penyimpanan,
+        buyDate:        item.tanggal_beli,
+        status:         item.action === 'terpakai' ? 'used' : 'wasted',
+        imageUrl:       item.foto_url ?? null,
+        category:       item.jenis_item ?? item.kategori ?? 'Lainnya',
+        updatedAt:      item.updatedAt ?? item.updated_at,
+      })))
+    } catch (error) {
+      console.error('Error fetching history:', error)
+    }
+  }
+
+  const fetchNotifications = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`${BASE_URL}/api/notification/history`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const raw = response.data.notifications || response.data || []
+      setNotifications(raw.map(n => ({
+        id:    n.id ?? n._id,
+        title: n.title ?? n.judul,
+        text:  n.body  ?? n.pesan ?? n.text,
+        time:  n.createdAt ? new Date(n.createdAt).toLocaleDateString('id-ID') : 'Baru saja',
+        emoji: n.type === 'expired' ? '🔴' : n.type === 'soon' ? '🟡' : '✅',
+        type:  n.type,
+      })))
+    } catch (error) {
+      console.error('Error fetching notifications:', error)
+    }
+  }
+
   useEffect(() => {
     if (screen === SCREENS.HOME) {
       fetchStocks();
       fetchInventorySummary();
     }
+    if (screen === SCREENS.HISTORY) {
+      fetchHistory();
+    }
+    if (screen === SCREENS.NOTIFICATION) {
+      fetchNotifications();
+    }
   }, [screen]);
 
-  const addStock = (item) => {
-    const newItem = {
-      id:        Date.now(),
-      name:      item.name,
-      category:  item.category,    
-      itemType:  item.itemType,    
-      quantity:  item.quantity ?? '',
-      storedIn:  item.storedIn ?? '',
-      inputDate: new Date().toLocaleDateString('id-ID'),
-      imageUrl:  item.imageUrl ?? null,
-      emoji:     item.emoji ?? '🥗',
+  const addStock = async (item) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.post(`${BASE_URL}/api/inventory`, {
+        nama_item:          item.name,
+        kondisi_fisik:      item.condition,
+        lokasi_penyimpanan: item.storedIn,
+        tanggal_beli:       item.buyDate,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-      condition:       item.condition ?? null,      
-      estimatedExpiry: item.estimatedExpiry ?? null,
-      shelfDays:       item.shelfDays ?? null,      
-      aiConfidence:    item.aiConfidence ?? null,
+      await fetchStocks();
 
-      expiryDate:      item.expiryDate ?? null, 
+      setNotifications((prev) => [{
+        id: Date.now() + 1,
+        title: `${item.name} berhasil ditambahkan!`,
+        text: `Pantau kondisi ${item.name} agar tidak terbuang.`,
+        time: 'Baru saja', emoji: '✅', type: 'info',
+      }, ...prev]);
 
-      status: item.status ?? 'fresh',
+      setAddModalOpen(false)
+      setSuccessModalOpen(true)
+    } catch (error) {
+      console.error('Error menambahkan stok:', error)
     }
-
-    setStocks((prev) => [newItem, ...prev])
-    setAddModalOpen(false)
-    setSuccessModalOpen(true)
-
-    setNotifications((prev) => [{
-      id: Date.now() + 1,
-      title: `${item.name} berhasil ditambahkan!`,
-      text: `Pantau kondisi ${item.name} agar tidak terbuang.`,
-      time: 'Baru saja', emoji: '✅', type: 'info',
-    }, ...prev])
   }
 
   const markUsed = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${BASE_URL}/api/inventory/${id}/used`, {}, {
+      await axios.patch(`${BASE_URL}/api/inventory/${id}/used`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       fetchStocks();
     } catch (error) {
       alert('Gagal menandai item sebagai terpakai. Silakan coba lagi.')
@@ -150,10 +238,9 @@ export function AppProvider({ children }) {
   const throwAway = async (id) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.post(`${BASE_URL}/api/inventory/${id}/wasted`, {}, {
+      await axios.patch(`${BASE_URL}/api/inventory/${id}/wasted`, {}, {
         headers: { Authorization: `Bearer ${token}` },
       });
-
       fetchStocks();
     } catch (error) {
       alert('Gagal menandai item sebagai dibuang. Silakan coba lagi.')
@@ -166,7 +253,6 @@ export function AppProvider({ children }) {
     setStocks((prev) => [{ ...item, id: Date.now(), status: 'fresh' }, ...prev])
     setHistory((prev) => prev.filter((h) => h.id !== histId))
   }
-
 
   const value = {
     screen, navigate, goBack,
@@ -182,7 +268,9 @@ export function AppProvider({ children }) {
     selectedItem, openItemDetail,
     setStocks,
     registerUser,
+    loginUser, 
     authLoading,
+    fetchHistory, fetchNotifications,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>

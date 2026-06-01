@@ -9,7 +9,7 @@ import assetSayuran from '../../assets/images/default-sayur.png'
 
 const DEFAULT_ASSET = {
   Buah:    assetBuah,
-  Sayuran: assetSayuran,
+  Sayur: assetSayuran,
 }
 
 function IconInfo({ size = 16 }) {
@@ -30,10 +30,6 @@ function IconTrash({ size = 16 }) {
       <path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2"/>
     </svg>
   )
-}
-
-const EMOJI_MAP = {
-  Sayuran: '🥬', Buah: '🍎',
 }
 
 const STATUS_COLOR = {

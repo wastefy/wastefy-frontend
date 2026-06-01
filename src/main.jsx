@@ -7,6 +7,7 @@ import './styles/auth.css'
 import './styles/components.css'
 import { AppProvider } from './context/AppContext'
 import App from './App'
+import './config/firebase';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

@@ -5,7 +5,7 @@ import assetSayuran from '../../assets/images/default-sayur.png'
 
 const DEFAULT_ASSET = {
   Buah:    assetBuah,
-  Sayuran: assetSayuran,
+  Sayur: assetSayuran,
 }
 
 function IconTrash({ size = 13 }) {
@@ -26,11 +26,10 @@ export default function StockCard({ item }) {
   }
 
   const renderThumbnail = () => {
-    /* 1. Foto dari user (upload manual / AI) */
     if (item.imageUrl) {
       return <img src={item.imageUrl} alt={item.name} />
     }
-    /* 2. Asset default Buah atau Sayuran */
+    
     if (DEFAULT_ASSET[item.category]) {
       return (
         <img
@@ -41,7 +40,9 @@ export default function StockCard({ item }) {
       )
     }
   }
-
+  
+  console.log(item)
+  
   return (
     <div
       className="stock-card"
