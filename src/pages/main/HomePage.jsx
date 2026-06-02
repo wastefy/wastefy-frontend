@@ -8,10 +8,10 @@ import { IconSettings, IconPlus } from '../../components/common/Icons'
 import mascotDashboard from '../../assets/images/mascot-dashboard.png'
 
 const FILTERS = [
-  { label: 'Semua',     value: 'all'                   },
-  { label: 'Segar',   value: STOCK_STATUS.FRESH      },
-  { label: 'Segera',    value: STOCK_STATUS.SOON       },
-  { label: 'Kadaluarsa', value: STOCK_STATUS.EXPIRED    },
+  { label: 'Semua', value: 'all' },
+  { label: 'Segar', value: STOCK_STATUS.FRESH },
+  { label: 'Segera', value: STOCK_STATUS.SOON },
+  { label: 'Kadaluarsa', value: STOCK_STATUS.EXPIRED },
 ]
 
 export default function HomePage() {
@@ -35,7 +35,7 @@ export default function HomePage() {
       <div className="app-header">
         <h1 className="app-header__title">Stok Anda</h1>
         <button
-          className="app-header__icon-btn"
+          className="app-header__icon-btn hide-on-desktop"
           onClick={() => navigate(SCREENS.SETTINGS)}
           aria-label="Settings"
         >
@@ -74,7 +74,7 @@ export default function HomePage() {
         <IconPlus />
       </button>
 
-      {addModalOpen    && <AddItemModal />}
+      {addModalOpen && <AddItemModal />}
       {successModalOpen && <SuccessModal />}
 
     </div>

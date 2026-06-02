@@ -23,7 +23,11 @@
 }
 
 @media (max-width: 430px) {
-  .phone-wrapper { width: 100vw; min-height: 100dvh; border-radius: 0; }
+  .phone-wrapper {
+    width: 100vw;
+    min-height: 100dvh;
+    border-radius: 0;
+  }
 }
 
 /* app screen */
@@ -80,7 +84,9 @@
   transition: opacity var(--t-fast);
 }
 
-.app-header__icon-btn:hover { opacity: 0.6; }
+.app-header__icon-btn:hover {
+  opacity: 0.6;
+}
 
 /* content */
 /* .app-content {
@@ -99,7 +105,9 @@
 /* bottom nav */
 .bottom-nav {
   position: absolute;
-  bottom: 0; left: 0; right: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
   height: 70px;
   background: var(--color-navbar-bg);
   border-radius: 36px 36px 0 0;
@@ -122,8 +130,13 @@
   transition: all var(--t-base);
 }
 
-.bottom-nav__item--active { color: var(--color-navbar-active); }
-.bottom-nav__item:hover   { background: rgba(255,255,255,0.1); }
+.bottom-nav__item--active {
+  color: var(--color-navbar-active);
+}
+
+.bottom-nav__item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
 
 /* FAB */
 .fab {
@@ -142,8 +155,14 @@
   z-index: 20;
   transition: transform var(--t-base), background var(--t-slow);
 }
-.fab:hover  { transform: scale(1.08); }
-.fab:active { transform: scale(0.95); }
+
+.fab:hover {
+  transform: scale(1.08);
+}
+
+.fab:active {
+  transform: scale(0.95);
+}
 
 /* Filter Tabs */
 .filter-tabs {
@@ -181,23 +200,50 @@
 
 /* animations */
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0);   }
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes slideUp {
-  from { transform: translateY(100%); }
-  to   { transform: translateY(0);    }
+  from {
+    transform: translateY(100%);
+  }
+
+  to {
+    transform: translateY(0);
+  }
 }
 
 @keyframes scaleIn {
-  from { opacity: 0; transform: scale(0.88); }
-  to   { opacity: 1; transform: scale(1);    }
+  from {
+    opacity: 0;
+    transform: scale(0.88);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
 
-.anim-fade-in  { animation: fadeIn  0.3s ease forwards; }
-.anim-slide-up { animation: slideUp var(--t-spring) forwards; }
-.anim-scale-in { animation: scaleIn 0.24s ease forwards; }
+.anim-fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.anim-slide-up {
+  animation: slideUp var(--t-spring) forwards;
+}
+
+.anim-scale-in {
+  animation: scaleIn 0.24s ease forwards;
+}
 
 .desktop-navbar {
   display: none;
@@ -233,8 +279,12 @@
   }
 
   .fab {
-    position:fixed;
+    position: fixed;
     bottom: var(--sp-8);
     right: var(--sp-10);
+  }
+
+  .hide-on-desktop {
+    display: none !important;
   }
 }

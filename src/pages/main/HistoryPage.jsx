@@ -59,7 +59,7 @@ export default function HistoryPage() {
       <div className="app-header">
         <h1 className="app-header__title">Riwayat</h1>
         <button
-          className="app-header__icon-btn"
+          className="app-header__icon-btn hide-on-desktop"
           onClick={() => navigate(SCREENS.SETTINGS)}
           aria-label="Settings"
         >
