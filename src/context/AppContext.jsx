@@ -1,6 +1,6 @@
+import axios from 'axios'
 import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
-import axios from 'axios'
 import api from '../utils/axiosInstance'
 import {
   signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
@@ -153,13 +153,13 @@ export function AppProvider({ children }) {
   const registerUser = async (name, email, password) => {
     try {
       setAuthLoading(true);
-      const response = await api.post('/api/auth/register', {
-        name,
+      const response = await axios.post(`${BASE_URL}/api/auth/register`, {  
+        nama: name,
         email,
         password
       });
 
-      if (response.data.success) {
+      if (response.data.success || response.status === 200 || response.status === 201) {
         return { success: true, message: response.data.message || 'Pendaftaran berhasil.' };
       }
     } catch (error) {
