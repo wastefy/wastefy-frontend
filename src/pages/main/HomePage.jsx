@@ -11,7 +11,7 @@ const FILTERS = [
   { label: 'Semua',     value: 'all'                   },
   { label: 'Segar',   value: STOCK_STATUS.FRESH      },
   { label: 'Segera',    value: STOCK_STATUS.SOON       },
-  { label: 'Kadaluwarsa', value: STOCK_STATUS.EXPIRED    },
+  { label: 'Kadaluarsa', value: STOCK_STATUS.EXPIRED    },
 ]
 
 export default function HomePage() {

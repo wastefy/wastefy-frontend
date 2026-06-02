@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
 import axios from 'axios'
 import api from '../utils/axiosInstance'
-import { signInWithEmailAndPassword
+import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
+  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
  } from 'firebase/auth' 
 import { auth } from '../config/firebase'
 
@@ -37,6 +38,57 @@ export function AppProvider({ children }) {
     name: 'Your Name', email: 'yourname@gmail.com',
     avatarUrl: null, linkedGoogle: false,
   })
+
+  const loginWithGoogle = async () => {
+    try {
+      setAuthLoading(true)
+      const provider = new GoogleAuthProvider()
+      
+      provider.setCustomParameters({
+        prompt: 'select_account'
+      })
+
+      const userCredential = await signInWithPopup(auth, provider)
+      const token = await userCredential.user.getIdToken()
+      localStorage.setItem('token', token)
+
+      await axios.post(`${BASE_URL}/api/auth/login`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      setProfile(prev => ({
+        ...prev,
+        email: userCredential.user.email,
+        name: userCredential.user.displayName || prev.name,
+        avatarUrl: userCredential.user.photoURL || null,
+      }))
+
+      return { success: true }
+    } catch (error) {
+      console.error('Google login error:', error)
+      return { success: false, message: error.message || 'Gagal masuk dengan Google.' }
+    } finally {
+      setAuthLoading(false)
+    }
+  }
+
+  const loginWithEmailLink = async (email) => {
+    try {
+      setAuthLoading(true)
+      const actionCodeSettings = {
+        url: window.location.href,
+        handleCodeInApp: true,
+      }
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings)
+      localStorage.setItem('emailForSignIn', email)
+      return { success: true, message: 'Link masuk telah dikirim ke email Anda.' }
+    } catch (error) {
+      console.error('Email link error:', error)
+      return { success: false, message: 'Gagal mengirim link. Periksa email Anda.' }
+    } finally {
+      setAuthLoading(false)
+    }
+  }
 
   const registerUser = async (name, email, password) => {
     try {
@@ -271,7 +323,7 @@ export function AppProvider({ children }) {
     selectedItem, openItemDetail,
     setStocks,
     registerUser,
-    loginUser, 
+    loginUser, loginWithGoogle, loginWithEmailLink,
     authLoading,
     fetchHistory, fetchNotifications,
   }
