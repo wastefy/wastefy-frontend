@@ -9,7 +9,7 @@ const OPTIONS = [
 ]
 
 export default function NotifSettingsPage() {
-  const { goBack, notifSetting, setNotifSetting } = useApp()
+  const { goBack, notifSetting, setNotifSetting, saveNotificationToken, deleteNotificationToken } = useApp()
 
   return (
     <div className="app-screen">
@@ -34,7 +34,11 @@ export default function NotifSettingsPage() {
             <div
               key={value}
               className="radio-item"
-              onClick={() => setNotifSetting(value)}
+              onClick={async () => {
+                setNotifSetting(value)
+                if (value === 'allow') await saveNotificationToken()
+                else await deleteNotificationToken()
+              }}
             >
               <div className={`radio-item__circle ${notifSetting === value ? 'radio-item__circle--selected' : ''}`} />
               <span>{label}</span>

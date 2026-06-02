@@ -19,7 +19,7 @@ function getInitials(name = '') {
 }
 
 export default function SettingsPage() {
-  const { navigate, goBack, darkMode, setDarkMode, profile } = useApp()
+  const { navigate, goBack, darkMode, setDarkMode, profile, logoutUser } = useApp()
 
   const initials = getInitials(profile.name) || '?'
 
@@ -73,7 +73,7 @@ export default function SettingsPage() {
               <div className="toggle__knob" />
             </div>
           </div>
-          <div className="settings-menu-item" onClick={() => navigate(SCREENS.LANDING)}>
+          <div className="settings-menu-item" onClick={logoutUser}>
             <div className="settings-menu-item__left"><IconLogout /> Keluar</div>
           </div>
         </div>

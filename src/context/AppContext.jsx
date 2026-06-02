@@ -5,25 +5,29 @@ import api from '../utils/axiosInstance'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
  } from 'firebase/auth' 
+import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../config/firebase'
+import { getToken, onMessage } from "firebase/messaging";
+import { messaging } from "../config/firebase";
+
 
 const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
-  const [screen, setScreen]           = useState(SCREENS.LANDING)
-  const [prevScreen, setPrevScreen]   = useState(null)
-  const [activeTab, setActiveTab]     = useState(TABS.HOME)
-  const [stocks, setStocks]           = useState([])
+  const [screen, setScreen] = useState(SCREENS.LANDING)
+  const [prevScreen, setPrevScreen] = useState(null)
+  const [activeTab, setActiveTab] = useState(TABS.HOME)
+  const [stocks, setStocks] = useState([])
   const [stockFilter, setStockFilter] = useState('all')
-  const [history, setHistory]             = useState([])
+  const [history, setHistory] = useState([])
   const [historyFilter, setHistoryFilter] = useState('all')
   const [notifications, setNotifications] = useState([])
-  const [addModalOpen, setAddModalOpen]         = useState(false)
+  const [addModalOpen, setAddModalOpen] = useState(false)
   const [successModalOpen, setSuccessModalOpen] = useState(false)
-  const [darkMode, setDarkMode]         = useState(false)
+  const [darkMode, setDarkMode] = useState(false)
   const [notifSetting, setNotifSetting] = useState('allow')
   const [authLoading, setAuthLoading] = useState(false)
-  
+
   const navigate = (to) => { setPrevScreen(screen); setScreen(to) }
   const goBack = () => {
     if (prevScreen) { setScreen(prevScreen); setPrevScreen(null) }
@@ -89,16 +93,72 @@ export function AppProvider({ children }) {
       setAuthLoading(false)
     }
   }
+  const saveNotificationToken = async () => {
+    try {
+      const permission = await Notification.requestPermission();
+      if (permission !== "granted") return;
+
+      const firebaseToken = localStorage.getItem("token");
+
+      const fcmToken = await getToken(messaging, {
+        vapidKey: import.meta.env.VITE_FIREBASE_VAPID_KEY,
+      });
+
+      if (!fcmToken) return;
+
+      await axios.post(
+        `${BASE_URL}/api/notifications/token`,
+        { token: fcmToken },
+        {
+          headers: {
+            Authorization: `Bearer ${firebaseToken}`,
+          },
+        }
+      );
+
+      console.log("FCM Token saved");
+    } catch (err) {
+      console.error("FCM Error:", err);
+    }
+  };
+
+  const deleteNotificationToken = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`${BASE_URL}/api/notifications/token`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+    } catch (err) {
+      console.error('Delete token error:', err)
+    }
+  }
+
+  const checkNotification = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        `${BASE_URL}/api/notifications/check`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+    } catch (err) {
+      console.error("Trigger Check Error:", err);
+    }
+  };
 
   const registerUser = async (name, email, password) => {
     try {
       setAuthLoading(true);
       const response = await api.post('/api/auth/register', {
-        name, 
+        name,
         email,
         password
       });
-      
+
       if (response.data.success) {
         return { success: true, message: response.data.message || 'Pendaftaran berhasil.' };
       }
@@ -117,13 +177,16 @@ export function AppProvider({ children }) {
       const user = userCredential.user
 
       const token = await user.getIdToken()
-      localStorage.setItem('token', token) 
+      localStorage.setItem('token', token)
 
       setProfile((prev) => ({
         ...prev,
         email: user.email,
         name: user.displayName || prev.name
       }))
+
+      // Pemicu token FCM
+      await saveNotificationToken();
 
       return { success: true, user }
     } catch (error) {
@@ -138,6 +201,15 @@ export function AppProvider({ children }) {
     } finally {
       setAuthLoading(false)
     }
+  }
+
+  const logoutUser = () => {
+    localStorage.removeItem('token')
+    setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
+    setStocks([])
+    setHistory([])
+    setNotifications([])
+    navigate(SCREENS.LANDING)
   }
 
   const [selectedItem, setSelectedItem] = useState(null)
@@ -155,16 +227,16 @@ export function AppProvider({ children }) {
   const [inventorySummary, setInventorySummary] = useState(null);
 
   const mapItem = (raw) => ({
-    id:             raw.id,
-    name:           raw.nama_item,
-    condition:      raw.kondisi_fisik,
+    id: raw.id,
+    name: raw.nama_item,
+    condition: raw.kondisi_fisik,
     conditionLabel: raw.kondisi_fisik,
-    storedIn:       raw.lokasi_penyimpanan,
-    buyDate:        raw.tanggal_beli,
-    status:         raw.status?.toLowerCase(),   
-    category:       raw.jenis_item ??raw.kategori ?? raw.category ?? 'Lainnya',
-    imageUrl:       raw.foto_url ?? raw.imageUrl ?? null,
-    shelfDays:      raw.sisa_hari ?? raw.shelf_days ?? null,
+    storedIn: raw.lokasi_penyimpanan,
+    buyDate: raw.tanggal_beli,
+    status: raw.status?.toLowerCase(),
+    category: raw.jenis_item ?? raw.kategori ?? raw.category ?? 'Lainnya',
+    imageUrl: raw.foto_url ?? raw.imageUrl ?? null,
+    shelfDays: raw.sisa_hari ?? raw.shelf_days ?? null,
   })
 
   const fetchStocks = async () => {
@@ -199,16 +271,16 @@ export function AppProvider({ children }) {
       })
       const raw = response.data.history || response.data.items || []
       setHistory(raw.map(item => ({
-        id:             item.id ?? item._id,
-        name:           item.nama_item,
-        condition:      item.kondisi_fisik,
+        id: item.id ?? item._id,
+        name: item.nama_item,
+        condition: item.kondisi_fisik,
         conditionLabel: item.kondisi_fisik,
-        storedIn:       item.lokasi_penyimpanan,
-        buyDate:        item.tanggal_beli,
-        status:         item.archiveAction === 'terpakai' ? 'used' : 'wasted',
-        imageUrl:       item.foto_url ?? null,
-        category:       item.jenis_item ?? item.kategori ?? 'Lainnya',
-        updatedAt:      item.updatedAt ?? item.updated_at,
+        storedIn: item.lokasi_penyimpanan,
+        buyDate: item.tanggal_beli,
+        status: item.archiveAction === 'terpakai' ? 'used' : 'wasted',
+        imageUrl: item.foto_url ?? null,
+        category: item.jenis_item ?? item.kategori ?? 'Lainnya',
+        updatedAt: item.updatedAt ?? item.updated_at,
       })))
     } catch (error) {
       console.error('Error fetching history:', error)
@@ -217,21 +289,39 @@ export function AppProvider({ children }) {
 
   const fetchNotifications = async () => {
     try {
-      const token = localStorage.getItem('token')
-      const response = await axios.get(`${BASE_URL}/api/notification/history`, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      const raw = response.data.notifications || response.data || []
-      setNotifications(raw.map(n => ({
-        id:    n.id ?? n._id,
-        title: n.title ?? n.judul,
-        text:  n.body  ?? n.pesan ?? n.text,
-        time:  n.createdAt ? new Date(n.createdAt).toLocaleDateString('id-ID') : 'Baru saja',
-        emoji: n.type === 'expired' ? '🔴' : n.type === 'soon' ? '🟡' : '✅',
-        type:  n.type,
-      })))
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        `${BASE_URL}/api/notifications/history`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      console.log("NOTIF RESPONSE:", response.data);
+      const raw = response.data.history || response.data.notifications || response.data.data || [];
+
+      setNotifications(
+        raw.map((n) => ({
+          id: n.id ?? n._id,
+          title: n.title,
+          text: n.body ?? n.text,
+          time: n.createdAt
+            ? new Date(n.createdAt).toLocaleDateString("id-ID")
+            : "Baru saja",
+          emoji:
+            n.type === "expired"
+              ? "🔴"
+              : n.type === "soon"
+                ? "🟡"
+                : "🔔",
+          type: n.type,
+        }))
+      );
     } catch (error) {
-      console.error('Error fetching notifications:', error)
+      console.error("Error fetching notifications:", error);
     }
   }
 
@@ -248,27 +338,42 @@ export function AppProvider({ children }) {
     }
   }, [screen]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+
+    // Hanya berjalan jika user sudah terautentikasi (mempunyai token)
+    if (token) {
+      // Ambil daftar riwayat notifikasi awal
+      fetchNotifications();
+
+      // Perintahkan backend mengecek masa kedaluwarsa item saat ini
+      checkNotification();
+
+      // Pasang listener FCM real-time (aplikasi dalam kondisi terbuka)
+      const unsubscribe = onMessage(messaging, (payload) => {
+        console.log("Notification received in foreground:", payload);
+        // Otomatis refresh list notifikasi di tempat tanpa reload halaman
+        fetchNotifications();
+      });
+
+      return () => unsubscribe();
+    }
+  }, []);
+
   const addStock = async (item) => {
     try {
       const token = localStorage.getItem('token');
       await axios.post(`${BASE_URL}/api/inventory`, {
-        nama_item:          item.name,
-        kondisi_fisik:      item.condition,
+        nama_item: item.name,
+        kondisi_fisik: item.condition,
         lokasi_penyimpanan: item.storedIn,
-        tanggal_beli:       item.buyDate,
+        tanggal_beli: item.buyDate,
       }, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       await fetchStocks();
-
-      setNotifications((prev) => [{
-        id: Date.now() + 1,
-        title: `${item.name} berhasil ditambahkan!`,
-        text: `Pantau kondisi ${item.name} agar tidak terbuang.`,
-        time: 'Baru saja', emoji: '✅', type: 'info',
-      }, ...prev]);
-
+      await checkNotification();
       setAddModalOpen(false)
       setSuccessModalOpen(true)
     } catch (error) {
@@ -288,7 +393,7 @@ export function AppProvider({ children }) {
       alert('Gagal menandai item sebagai terpakai. Silakan coba lagi.')
     }
   }
-  
+
   const throwAway = async (id) => {
     try {
       const token = localStorage.getItem('token');
@@ -324,8 +429,12 @@ export function AppProvider({ children }) {
     setStocks,
     registerUser,
     loginUser, loginWithGoogle, loginWithEmailLink,
+    loginUser,
     authLoading,
     fetchHistory, fetchNotifications,
+    logoutUser,
+    saveNotificationToken,
+    deleteNotificationToken,
   }
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>
