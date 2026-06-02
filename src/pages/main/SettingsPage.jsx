@@ -29,7 +29,7 @@ export default function SettingsPage() {
 
       <div className="app-header">
         <div className="app-header__back-row">
-          <button className="app-header__icon-btn" onClick={goBack} aria-label="Go back">
+          <button className="app-header__icon-btn" onClick={() => navigate(SCREENS.HOME)} aria-label="Go back">
             <IconArrowLeft />
           </button>
           <h1 className="app-header__title">Pengaturan</h1>
