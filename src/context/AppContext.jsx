@@ -2,9 +2,10 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
 import axios from 'axios'
 import api from '../utils/axiosInstance'
-import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
+import {
+  signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
- } from 'firebase/auth' 
+} from 'firebase/auth'
 import { auth } from '../config/firebase'
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging } from "../config/firebase";
@@ -46,7 +47,7 @@ export function AppProvider({ children }) {
     try {
       setAuthLoading(true)
       const provider = new GoogleAuthProvider()
-      
+
       provider.setCustomParameters({
         prompt: 'select_account'
       })
@@ -406,11 +407,17 @@ export function AppProvider({ children }) {
     }
   }
 
-  const addBackToStock = (histId) => {
-    const item = history.find((h) => h.id === histId)
-    if (!item) return
-    setStocks((prev) => [{ ...item, id: Date.now(), status: 'fresh' }, ...prev])
-    setHistory((prev) => prev.filter((h) => h.id !== histId))
+  const addBackToStock = async (histId) => {
+    try {
+      const token = localStorage.getItem('token')
+      await axios.patch(`${BASE_URL}/api/inventory/${histId}/restore`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      await fetchStocks()
+      await fetchHistory()
+    } catch (error) {
+      alert('Gagal mengembalikan item ke stok. Silakan coba lagi.')
+    }
   }
 
   const value = {

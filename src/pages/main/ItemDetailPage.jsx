@@ -1,14 +1,15 @@
+import axios from 'axios'
 import { useApp } from '../../context/AppContext'
-import { STORAGE_TIPS, STATUS_LABELS } from '../../constants'
+import { STORAGE_TIPS, STATUS_LABELS, BASE_URL } from '../../constants'
 import StatusBar from '../../components/layout/StatusBar'
 import BottomNav from '../../components/layout/BottomNav'
 import { IconArrowLeft } from '../../components/common/Icons'
 
-import assetBuah    from '../../assets/images/default-buah.png'
+import assetBuah from '../../assets/images/default-buah.png'
 import assetSayuran from '../../assets/images/default-sayur.png'
 
 const DEFAULT_ASSET = {
-  Buah:    assetBuah,
+  Buah: assetBuah,
   Sayur: assetSayuran,
 }
 
@@ -16,9 +17,9 @@ function IconInfo({ size = 16 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="8" x2="12" y2="12"/>
-      <line x1="12" y1="16" x2="12.01" y2="16"/>
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="8" x2="12" y2="12" />
+      <line x1="12" y1="16" x2="12.01" y2="16" />
     </svg>
   )
 }
@@ -27,14 +28,14 @@ function IconTrash({ size = 16 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2"/>
+      <path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2" />
     </svg>
   )
 }
 
 const STATUS_COLOR = {
-  fresh:   { bg: 'rgba(76,175,80,0.12)',  text: '#2E7D32' },
-  soon:    { bg: 'rgba(255,193,7,0.15)',  text: '#F57F17' },
+  fresh: { bg: 'rgba(76,175,80,0.12)', text: '#2E7D32' },
+  soon: { bg: 'rgba(255,193,7,0.15)', text: '#F57F17' },
   expired: { bg: 'rgba(244,67,54,0.12)', text: '#C62828' },
 }
 
@@ -45,11 +46,19 @@ export default function ItemDetailPage() {
   if (!item) { goBack(); return null }
 
   const statusColor = STATUS_COLOR[item.status] ?? STATUS_COLOR.fresh
-  const storageTip  = STORAGE_TIPS[item.category] ?? STORAGE_TIPS.Lainnya
+  const storageTip = STORAGE_TIPS[item.category] ?? STORAGE_TIPS.Lainnya
 
-  const handleRemove = () => {
-    setStocks(prev => prev.filter(s => s.id !== item.id))
-    goBack()
+  const handleRemove = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`${BASE_URL}/api/inventory/${item.id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setStocks(prev => prev.filter(s => s.id !== item.id))
+      goBack()
+    } catch (error) {
+      alert('Gagal menghapus item. Silakan coba lagi.')
+    }
   }
 
   return (
@@ -72,11 +81,11 @@ export default function ItemDetailPage() {
             ? <img src={item.imageUrl} alt={item.name} className="item-detail__hero-img" />
             : DEFAULT_ASSET[item.category]
               ? <img
-                  src={DEFAULT_ASSET[item.category]}
-                  alt={item.category}
-                  className="item-detail__hero-img"
-                  style={{ objectFit: 'contain', padding: 32 }}
-                />
+                src={DEFAULT_ASSET[item.category]}
+                alt={item.category}
+                className="item-detail__hero-img"
+                style={{ objectFit: 'contain', padding: 32 }}
+              />
               : (
                 <div className="item-detail__hero-emoji">
                   <span>{EMOJI_MAP[item.category] ?? item.emoji ?? '📦'}</span>
@@ -97,10 +106,10 @@ export default function ItemDetailPage() {
           <h2 className="item-detail__name">{item.name}</h2>
 
           <div className="item-detail__info-card">
-            <InfoRow label="Kategori"       value={item.category}  />
-            <InfoRow label="Kondisi"        value={item.conditionLabel ?? item.condition} />
-            <InfoRow label="Lokasi Simpan"    value={item.storedIn}  />
-            <InfoRow label="Tanggal beli"   value={item.buyDate ?? item.inputDate} />
+            <InfoRow label="Kategori" value={item.category} />
+            <InfoRow label="Kondisi" value={item.conditionLabel ?? item.condition} />
+            <InfoRow label="Lokasi Simpan" value={item.storedIn} />
+            <InfoRow label="Tanggal beli" value={item.buyDate ?? item.inputDate} />
             {item.shelfDays != null && (
               <InfoRow label="Estimasi sisa" value={`${item.shelfDays} hari`} />
             )}

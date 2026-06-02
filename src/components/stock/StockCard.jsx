@@ -1,10 +1,12 @@
+import axios from 'axios'
+import { BASE_URL } from '../../constants'
 import { useApp } from '../../context/AppContext'
 import StatusBadge from '../common/StatusBadge'
-import assetBuah    from '../../assets/images/default-buah.png'
+import assetBuah from '../../assets/images/default-buah.png'
 import assetSayuran from '../../assets/images/default-sayur.png'
 
 const DEFAULT_ASSET = {
-  Buah:    assetBuah,
+  Buah: assetBuah,
   Sayur: assetSayuran,
 }
 
@@ -13,7 +15,7 @@ function IconTrash({ size = 13 }) {
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
       stroke="currentColor" strokeWidth="2.2"
       strokeLinecap="round" strokeLinejoin="round">
-      <path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2"/>
+      <path d="M3 6h18M19 6l-1 14H6L5 6M8 6V4h8v2" />
     </svg>
   )
 }
@@ -21,15 +23,23 @@ function IconTrash({ size = 13 }) {
 export default function StockCard({ item }) {
   const { markUsed, throwAway, openItemDetail, setStocks } = useApp()
 
-  const removeItem = (id) => {
-    setStocks(prev => prev.filter(s => s.id !== id))
+  const removeItem = async (id) => {
+    try {
+      const token = localStorage.getItem('token')
+      await axios.delete(`${BASE_URL}/api/inventory/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      setStocks(prev => prev.filter(s => s.id !== id))
+    } catch (error) {
+      alert('Gagal menghapus item. Silakan coba lagi.')
+    }
   }
 
   const renderThumbnail = () => {
     if (item.imageUrl) {
       return <img src={item.imageUrl} alt={item.name} />
     }
-    
+
     if (DEFAULT_ASSET[item.category]) {
       return (
         <img
@@ -40,9 +50,9 @@ export default function StockCard({ item }) {
       )
     }
   }
-  
+
   console.log(item)
-  
+
   return (
     <div
       className="stock-card"
