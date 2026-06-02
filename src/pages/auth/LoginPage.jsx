@@ -87,7 +87,6 @@ export default function LoginPage() {
       </div>
 
       <div className="auth-actions">
-        {/* PERBAIKAN: Menggunakan handleLoginSubmit saat diklik */}
         <button 
           className="btn btn--primary" 
           onClick={handleLoginSubmit}
@@ -103,7 +102,7 @@ export default function LoginPage() {
             <img src={googleIcon} alt="Google" className="btn__icon" />
             <span>Google</span>
           </button>
-          <button className="btn btn--social" onClick={handleEmailLink} disabled={authLoading}>
+          <button className="btn btn--social" onClick={() => navigate(SCREENS.LOGIN_EMAIL)} disabled={authLoading}>
             <img src={emailIcon} alt="Email" className="btn__icon" />
             <span>Email</span>
           </button>

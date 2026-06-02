@@ -9,6 +9,7 @@ import SignUpPage         from './pages/auth/SignUpPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
 import OTPPage            from './pages/auth/OTPPage'
 import SetPasswordPage    from './pages/auth/SetPasswordPage'
+import EmailLoginPage     from './pages/auth/EmailLoginPage'
 
 import HomePage           from './pages/main/HomePage'
 import NotificationPage   from './pages/main/NotificationPage'
@@ -22,6 +23,7 @@ const PAGE_MAP = {
   [SCREENS.LANDING]:        <LandingPage />,
   [SCREENS.LOGIN]:          <LoginPage />,
   [SCREENS.SIGNUP]:         <SignUpPage />,
+  [SCREENS.LOGIN_EMAIL]:    <EmailLoginPage />,
   [SCREENS.FORGOT]:         <ForgotPasswordPage />,
   [SCREENS.OTP]:            <OTPPage />,
   [SCREENS.SET_PASSWORD]:   <SetPasswordPage />,

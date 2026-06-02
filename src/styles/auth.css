@@ -187,11 +187,12 @@ body:has(.auth-screen) {
 .form-forgot {
   font-family: var(--font-display);
   text-align: right;
-  margin-top: var(--sp-1);
+  margin-top: var(--sp-2);
   font-size: var(--fs-xs);
   color: rgba(245, 240, 232, 0.65);
   text-decoration: underline;
   cursor: pointer;
+  margin-bottom: var(--sp-2);
 }
 
 .auth-divider {

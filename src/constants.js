@@ -3,6 +3,7 @@ export const BASE_URL = 'https://wastefy-backend-git-dev-wastefy-project-dicodin
 export const SCREENS = {
   LANDING:        'landing',
   LOGIN:          'login',
+  LOGIN_EMAIL:    'login_email',
   SIGNUP:         'signup',
   FORGOT:         'forgot',
   OTP:            'otp',

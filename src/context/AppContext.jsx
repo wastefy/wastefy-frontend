@@ -185,7 +185,6 @@ export function AppProvider({ children }) {
         name: user.displayName || prev.name
       }))
 
-      // Pemicu token FCM
       await saveNotificationToken();
 
       return { success: true, user }
