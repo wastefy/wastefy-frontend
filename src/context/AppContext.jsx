@@ -5,7 +5,6 @@ import api from '../utils/axiosInstance'
 import { signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
  } from 'firebase/auth' 
-import { signInWithEmailAndPassword } from 'firebase/auth'
 import { auth } from '../config/firebase'
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging } from "../config/firebase";
@@ -429,7 +428,6 @@ export function AppProvider({ children }) {
     setStocks,
     registerUser,
     loginUser, loginWithGoogle, loginWithEmailLink,
-    loginUser,
     authLoading,
     fetchHistory, fetchNotifications,
     logoutUser,
