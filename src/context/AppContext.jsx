@@ -2,7 +2,8 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
 import axios from 'axios'
 import api from '../utils/axiosInstance'
-import { signInWithEmailAndPassword } from 'firebase/auth' // getAuth dibersihkan dari sini
+import { signInWithEmailAndPassword
+ } from 'firebase/auth' 
 import { auth } from '../config/firebase'
 
 const AppContext = createContext(null)
@@ -40,7 +41,7 @@ export function AppProvider({ children }) {
   const registerUser = async (name, email, password) => {
     try {
       setAuthLoading(true);
-      const response = await api.patch('/api/auth/register', {
+      const response = await api.post('/api/auth/register', {
         name, 
         email,
         password
@@ -152,7 +153,7 @@ export function AppProvider({ children }) {
         conditionLabel: item.kondisi_fisik,
         storedIn:       item.lokasi_penyimpanan,
         buyDate:        item.tanggal_beli,
-        status:         item.action === 'terpakai' ? 'used' : 'wasted',
+        status:         item.archiveAction === 'terpakai' ? 'used' : 'wasted',
         imageUrl:       item.foto_url ?? null,
         category:       item.jenis_item ?? item.kategori ?? 'Lainnya',
         updatedAt:      item.updatedAt ?? item.updated_at,
@@ -230,6 +231,7 @@ export function AppProvider({ children }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchStocks();
+      fetchHistory();
     } catch (error) {
       alert('Gagal menandai item sebagai terpakai. Silakan coba lagi.')
     }
@@ -242,6 +244,7 @@ export function AppProvider({ children }) {
         headers: { Authorization: `Bearer ${token}` },
       });
       fetchStocks();
+      fetchHistory();
     } catch (error) {
       alert('Gagal menandai item sebagai dibuang. Silakan coba lagi.')
     }
