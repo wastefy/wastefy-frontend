@@ -6,17 +6,17 @@ import EmptyState from '../../components/common/EmptyState'
 import StatusBadge from '../../components/common/StatusBadge'
 import { IconSettings } from '../../components/common/Icons'
 import mascotHistory from '../../assets/images/mascot-history.png'
-import assetBuah    from '../../assets/images/default-buah.png'
+import assetBuah from '../../assets/images/default-buah.png'
 import assetSayur from '../../assets/images/default-sayur.png'
 
 const DEFAULT_ASSET = {
-  Buah:    assetBuah,
+  Buah: assetBuah,
   Sayur: assetSayur,
 }
 
 const FILTERS = [
-  { label: 'Semua',    value: 'all'    },
-  { label: 'Terpakai',   value: 'used'   },
+  { label: 'Semua', value: 'all' },
+  { label: 'Terpakai', value: 'used' },
   { label: 'Terbuang', value: 'wasted' },
 ]
 
@@ -81,7 +81,7 @@ export default function HistoryPage() {
 
       <div className="app-content">
         {historyLoading ? (
-          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-muted)'}}>
+          <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--color-text-muted)' }}>
             Memuat catatan riwayat...
           </div>
         ) : filtered.length === 0 ? (
@@ -101,7 +101,13 @@ export default function HistoryPage() {
                   <div className="stock-card__image">
                     {item.imageUrl || item.file_foto
                       ? <img src={item.imageUrl || item.file_foto} alt={item.nama_item || item.name} />
-                      : <span style={{ fontSize: 28 }}>{item.emoji ?? '🥗'}</span>
+                      : DEFAULT_ASSET[item.category]
+                        ? <img
+                          src={DEFAULT_ASSET[item.category]}
+                          alt={item.category}
+                          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4 }}
+                        />
+                        : <span style={{ fontSize: 28 }}>{item.emoji ?? '🥗'}</span>
                     }
                   </div>
                   <div className="stock-card__info">
