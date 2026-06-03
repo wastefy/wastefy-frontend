@@ -21,5 +21,6 @@ messaging.onBackgroundMessage((payload) => {
   })
 })`;
 
+fs.mkdirSync('./public', { recursive: true });
 fs.writeFileSync('./public/firebase-messaging-sw.js', content);
 console.log('✅ firebase-messaging-sw.js generated!');
