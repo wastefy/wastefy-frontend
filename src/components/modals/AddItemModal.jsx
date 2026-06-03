@@ -192,8 +192,6 @@ export default function AddItemModal() {
       if (response.status === 200 || response.status === 201) {
         if (typeof fetchStocks === "function") fetchStocks();
 
-        doAddStock();
-
         setAddModalOpen(false);
         if (typeof setSuccessModalOpen === "function") {
           setSuccessModalOpen(true);
