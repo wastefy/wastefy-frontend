@@ -48,8 +48,8 @@ export default function AddItemModal() {
   const {
     setAddModalOpen,
     addStock,
-    fetchStocks = () => {},
-    setSuccessModalOpen = () => {},
+    fetchStocks = () => { },
+    setSuccessModalOpen = () => { },
   } = useApp();
 
   const [form, setForm] = useState(BLANK);
@@ -178,55 +178,14 @@ export default function AddItemModal() {
   };
 
   const executeSubmit = async () => {
-    try {
-      const dataPayload = {
-        nama_item: form.name,
-        jenis_item: form.category,
-        kondisi_fisik: form.condition,
-        lokasi_penyimpanan: form.storedIn,
-        tanggal_beli: form.buyDate,
-      };
-
-      const response = await api.post("/api/inventory", dataPayload);
-
-      if (response.status === 200 || response.status === 201) {
-        if (typeof fetchStocks === "function") fetchStocks();
-
-        setAddModalOpen(false);
-        if (typeof setSuccessModalOpen === "function") {
-          setSuccessModalOpen(true);
-        }
-      }
-    } catch (error) {
-      console.error("Error submit inventory:", error);
-      const errorMsg =
-        error.response?.data?.message ||
-        "Terjadi kesalahan jaringan saat menambahkan item.";
-      alert(`Gagal menambahkan item: ${errorMsg}`);
-    }
-  };
-
-  const doAddStock = () => {
-    const condObj = conditionOptions.find((c) => c.value === form.condition);
-    const est = estimation ?? { days: 3, note: null };
-    if (typeof addStock === "function") {
-      addStock({
-        name: form.name,
-        category: form.category,
-        itemType: "fresh",
-        quantity: form.quantity || 1,
-        storedIn: form.storedIn,
-        buyDate: form.buyDate,
-        imageUrl: form.imageUrl,
-        condition: form.condition,
-        conditionLabel: condObj?.label ?? form.condition,
-        estimatedExpiry: calcExpiryDate(est.days),
-        shelfDays: est.days,
-        aiConfidence: null,
-        status: daysToStatus(est.days),
-      });
-    }
-  };
+    await addStock({
+      name: form.name,
+      category: form.category,
+      condition: form.condition,
+      storedIn: form.storedIn,
+      buyDate: form.buyDate,
+    })
+  }
 
   if (showRottenConfirm)
     return (
