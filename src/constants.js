@@ -58,7 +58,7 @@ export const STATUS_LABELS = {
 export const CONDITION_OPTIONS = {
   Sayur: [
     { value: 'Segar',       label: 'Segar',        multiplier: 1.0,  color: '#4CAF50', status: 'fresh'   },
-    { value: 'busuk',       label: 'Busuk',        multiplier: 0,    color: '#F44336', status: 'expired' },
+    { value: 'Busuk',       label: 'Busuk',        multiplier: 0,    color: '#F44336', status: 'expired' },
   ],
   Buah: [
     { value: 'Mentah',        label: 'Mentah',         multiplier: 1.5,  color: '#64B5F6', status: 'fresh'   },

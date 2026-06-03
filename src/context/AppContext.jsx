@@ -28,7 +28,7 @@ export function AppProvider({ children }) {
   const [notifSetting, setNotifSetting] = useState('allow')
   const [authLoading, setAuthLoading] = useState(false)
 
-  const navigate = (to) => { setPrevScreen(screen); setScreen(to) }
+  const navigate = (to) => { setPrevScreen(screen); setScreen(to); localStorage.setItem('lastScreen', to) }
   const goBack = () => {
     if (prevScreen) { setScreen(prevScreen); setPrevScreen(null) }
     else setScreen(SCREENS.LANDING)
@@ -153,7 +153,7 @@ export function AppProvider({ children }) {
   const registerUser = async (name, email, password) => {
     try {
       setAuthLoading(true);
-      const response = await axios.post(`${BASE_URL}/api/auth/register`, {  
+      const response = await axios.post(`${BASE_URL}/api/auth/register`, {
         nama: name,
         email,
         password
@@ -204,11 +204,14 @@ export function AppProvider({ children }) {
 
   const logoutUser = () => {
     localStorage.removeItem('token')
+    localStorage.removeItem('lastScreen')
     setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
     setStocks([])
     setHistory([])
     setNotifications([])
-    navigate(SCREENS.LANDING)
+    setScreen(SCREENS.LANDING)
+    setPrevScreen(null)
+
   }
 
   const [selectedItem, setSelectedItem] = useState(null)
@@ -217,6 +220,7 @@ export function AppProvider({ children }) {
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
   }, [darkMode])
+
 
   const openItemDetail = (item) => {
     setSelectedItem(item)
@@ -261,6 +265,23 @@ export function AppProvider({ children }) {
       console.error('Error fetching inventory summary:', error);
     }
   }
+  useEffect(() => {
+    const token = localStorage.getItem('token')
+    if (token) {
+      const lastScreen = localStorage.getItem('lastScreen')
+      // Hanya restore screen yang valid untuk user yang sudah login
+      const validScreens = [SCREENS.HOME, SCREENS.HISTORY, SCREENS.NOTIFICATION, SCREENS.SETTINGS]
+      const screenToGo = validScreens.includes(lastScreen) ? lastScreen : SCREENS.HOME
+
+      setScreen(screenToGo)
+      if (screenToGo === SCREENS.HOME) setActiveTab(TABS.HOME)
+      else if (screenToGo === SCREENS.HISTORY) setActiveTab(TABS.HISTORY)
+      else if (screenToGo === SCREENS.NOTIFICATION) setActiveTab(TABS.NOTIFICATION)
+      else setActiveTab(TABS.HOME)
+      fetchStocks()
+      fetchInventorySummary()
+    }
+  }, [])
 
   const fetchHistory = async () => {
     try {
@@ -362,21 +383,38 @@ export function AppProvider({ children }) {
   const addStock = async (item) => {
     try {
       const token = localStorage.getItem('token');
+
+      const tempItem = {
+        id: 'temp-' + Date.now(),
+        name: item.name,
+        category: item.category,
+        condition: item.condition,
+        conditionLabel: item.condition,
+        storedIn: item.storedIn,
+        buyDate: item.buyDate,
+        status: 'fresh',
+        imageUrl: null,
+      }
+      setStocks(prev => [tempItem, ...prev])
+      setAddModalOpen(false)
+      setSuccessModalOpen(true)
+
       await axios.post(`${BASE_URL}/api/inventory`, {
         nama_item: item.name,
+        jenis_item: item.category,
         kondisi_fisik: item.condition,
         lokasi_penyimpanan: item.storedIn,
         tanggal_beli: item.buyDate,
       }, {
         headers: { Authorization: `Bearer ${token}` },
-      });
+      })
 
-      await fetchStocks();
-      await checkNotification();
-      setAddModalOpen(false)
-      setSuccessModalOpen(true)
+      await Promise.all([fetchStocks(), checkNotification()])
+
     } catch (error) {
       console.error('Error menambahkan stok:', error)
+      setStocks(prev => prev.filter(s => !s.id.toString().startsWith('temp-')))
+      alert('Gagal menambahkan item. Silakan coba lagi.')
     }
   }
 
