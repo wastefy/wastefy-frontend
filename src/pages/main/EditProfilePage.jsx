@@ -51,6 +51,30 @@ export default function EditProfilePage() {
       alert('Gagal menyimpan profil. Silakan coba lagi.')
     }
   }
+
+  const handleLinkGoogle = async () => {
+    if (linkedGoogle) return
+
+    try {
+      const { auth } = await import('../../config/firebase')
+      const { GoogleAuthProvider, linkWithPopup } = await import('firebase/auth')
+
+      const provider = new GoogleAuthProvider()
+      await linkWithPopup(auth.currentUser, provider)
+
+      setLinkedGoogle(true)
+      localStorage.setItem('linkedGoogle', 'true')
+      alert('Akun Google berhasil dihubungkan!')
+    } catch (error) {
+      if (error.code === 'auth/provider-already-linked' ||
+        error.code === 'auth/credential-already-in-use') {
+        setLinkedGoogle(true)
+        localStorage.setItem('linkedGoogle', 'true')
+      } else {
+        alert('Gagal menghubungkan Google. Coba lagi.')
+      }
+    }
+  }
   return (
     <div className="app-screen">
       {/* <StatusBar variant="light" /> */}
@@ -115,8 +139,7 @@ export default function EditProfilePage() {
             </div>
             <span
               className={`linked-badge linked-badge--${linkedGoogle ? 'linked' : 'unlinked'}`}
-              onClick={() => setLinkedGoogle(v => !v)}
-            >
+              onClick={handleLinkGoogle}>
               {linkedGoogle ? 'Terhubung' : 'Hubungkan'}
             </span>
           </div>

@@ -205,6 +205,7 @@ export function AppProvider({ children }) {
   const logoutUser = () => {
     localStorage.removeItem('token')
     sessionStorage.removeItem('lastScreen')
+    localStorage.removeItem('linkedGoogle')  // ← tambah ini
     setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
     setStocks([])
     setHistory([])
@@ -265,6 +266,31 @@ export function AppProvider({ children }) {
       console.error('Error fetching inventory summary:', error);
     }
   }
+
+  const fetchProfile = async () => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await axios.get(`${BASE_URL}/api/auth/profile`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const user = response.data
+
+      // Cek provider dari Firebase Auth langsung
+      const { auth } = await import('../config/firebase')
+      const providerIds = auth.currentUser?.providerData?.map(p => p.providerId) || []
+      const isGoogleLinked = providerIds.includes('google.com') || localStorage.getItem('linkedGoogle') === 'true'
+
+      setProfile(prev => ({
+        ...prev,
+        name: user.nama || prev.name,
+        email: user.email || prev.email,
+        linkedGoogle: isGoogleLinked,
+      }))
+    } catch (err) {
+      console.error('Gagal fetch profile:', err)
+    }
+  }
+
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
@@ -280,6 +306,7 @@ export function AppProvider({ children }) {
       else setActiveTab(TABS.HOME)
       fetchStocks()
       fetchInventorySummary()
+      fetchProfile()
     }
   }, [])
 
