@@ -9,6 +9,9 @@ import { AppProvider } from './context/AppContext'
 import App from './App'
 import './config/firebase';
 
+import './styles/a.css'
+
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <AppProvider>

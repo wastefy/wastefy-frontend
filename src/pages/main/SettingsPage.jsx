@@ -24,7 +24,7 @@ export default function SettingsPage() {
   const initials = getInitials(profile.name) || '?'
 
   return (
-    <div className="app-screen">
+    <div className="app-screen settings-page">
       {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
@@ -36,7 +36,7 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      <div className="app-content" style={{ padding: '0 16px 110px' }}>
+      <div className="app-content settings-content" style={{ padding: '0 16px 110px' }}>
         <div
           className="settings-profile-card"
           style={{ cursor: 'pointer' }}
