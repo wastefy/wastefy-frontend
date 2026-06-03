@@ -28,7 +28,7 @@ export function AppProvider({ children }) {
   const [notifSetting, setNotifSetting] = useState('allow')
   const [authLoading, setAuthLoading] = useState(false)
 
-  const navigate = (to) => { setPrevScreen(screen); setScreen(to); localStorage.setItem('lastScreen', to) }
+  const navigate = (to) => { setPrevScreen(screen); setScreen(to); sessionStorage.setItem('lastScreen', to) }
   const goBack = () => {
     if (prevScreen) { setScreen(prevScreen); setPrevScreen(null) }
     else setScreen(SCREENS.LANDING)
@@ -204,7 +204,7 @@ export function AppProvider({ children }) {
 
   const logoutUser = () => {
     localStorage.removeItem('token')
-    localStorage.removeItem('lastScreen')
+    sessionStorage.removeItem('lastScreen')
     setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
     setStocks([])
     setHistory([])
@@ -268,7 +268,7 @@ export function AppProvider({ children }) {
   useEffect(() => {
     const token = localStorage.getItem('token')
     if (token) {
-      const lastScreen = localStorage.getItem('lastScreen')
+      const lastScreen = sessionStorage.getItem('lastScreen')
       // Hanya restore screen yang valid untuk user yang sudah login
       const validScreens = [SCREENS.HOME, SCREENS.HISTORY, SCREENS.NOTIFICATION, SCREENS.SETTINGS]
       const screenToGo = validScreens.includes(lastScreen) ? lastScreen : SCREENS.HOME
