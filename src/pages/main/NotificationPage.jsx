@@ -3,6 +3,7 @@ import { SCREENS } from '../../constants'
 import EmptyState from '../../components/common/EmptyState'
 import { IconSettings } from '../../components/common/Icons'
 import mascotNotification from '../../assets/images/mascot-notification.png'
+import { IconBell } from '../../components/common/Icons'
 
 function groupByDate(notifications) {
   const today = new Date()
@@ -62,7 +63,7 @@ export default function NotificationPage() {
                     {items.map((n) => (
                       <article key={n.id} className="notif-card">
                         <div className="notif-card__avatar">
-                          <span>{n.emoji}</span>
+                          <IconBell size={20} color="#2E4428" />
                         </div>
                         <div className="notif-card__body">
                           <div className="notif-card__title">{n.title}</div>
