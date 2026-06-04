@@ -24,7 +24,9 @@ export function AppProvider({ children }) {
   const [notifications, setNotifications] = useState([])
   const [addModalOpen, setAddModalOpen] = useState(false)
   const [successModalOpen, setSuccessModalOpen] = useState(false)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem('darkMode') === 'true'
+  })
   const [notifSetting, setNotifSetting] = useState('allow')
   const [authLoading, setAuthLoading] = useState(false)
 
@@ -205,7 +207,8 @@ export function AppProvider({ children }) {
   const logoutUser = () => {
     localStorage.removeItem('token')
     sessionStorage.removeItem('lastScreen')
-    localStorage.removeItem('linkedGoogle')  // ← tambah ini
+    localStorage.removeItem('linkedGoogle') 
+    localStorage.removeItem('darkMode')
     setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
     setStocks([])
     setHistory([])
@@ -220,6 +223,7 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+    localStorage.setItem('darkMode', darkMode)
   }, [darkMode])
 
 
