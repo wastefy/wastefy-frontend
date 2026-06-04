@@ -5,6 +5,14 @@ import EmptyState from '../../components/common/EmptyState'
 import StatusBadge from '../../components/common/StatusBadge'
 import { IconSettings } from '../../components/common/Icons'
 import mascotHistory from '../../assets/images/mascot-history.png'
+import assetBuah from '../../assets/images/default-buah.png'
+import assetSayuran from '../../assets/images/default-sayur.png'
+
+
+const DEFAULT_ASSET = {
+  Buah: assetBuah,
+  Sayur: assetSayuran,
+}
 
 const FILTERS = [
   { label: 'Semua', value: 'all' },
@@ -49,39 +57,55 @@ export default function HistoryPage() {
     })
   }
 
+  const renderThumbnail = (item) => {
+    if (item.imageUrl || item.file_foto) {
+      return <img src={item.imageUrl || item.file_foto} alt={item.nama_item || item.name} />
+    }
+    const category = item.category || item.kategori
+    if (DEFAULT_ASSET[category]) {
+      return (
+        <img
+          src={DEFAULT_ASSET[category]}
+          alt={category}
+          style={{ width: '100%', height: '100%', objectFit: 'contain', padding: 4 }}
+        />
+      )
+    }
+    return <span>{item.emoji ?? '🥗'}</span>
+  }
+
   return (
     <div className="app-screen =page">
       <div className="container">
         <div className="home-header">
-        <div>
-          <h1 className="header__title">Riwayat</h1>
+          <div>
+            <h1 className="header__title">Riwayat</h1>
+          </div>
+
+          <button
+            className="header__settings"
+            onClick={() => navigate(SCREENS.SETTINGS)}
+            aria-label="Settings"
+          >
+            <IconSettings />
+          </button>
         </div>
 
-        <button
-          className="header__settings"
-          onClick={() => navigate(SCREENS.SETTINGS)}
-          aria-label="Settings"
-        >
-          <IconSettings />
-        </button>
-      </div>
-
-      <div className="toolbar">
+        <div className="toolbar">
           <div className="filter-tabs">
             {FILTERS.map(({ label, value }) => (
               <button
                 key={value}
-                className={`filter-tab ${
-                  historyFilter === value ? 'filter-tab--active' : ''
-                }`}
+                className={`filter-tab ${historyFilter === value ? 'filter-tab--active' : ''
+                  }`}
                 onClick={() => setHistoryFilter(value)}
               >
                 {label}
               </button>
             ))}
           </div>
-        
-          </div>
+
+        </div>
 
         <div className="app-content history-content">
           {historyLoading ? (
@@ -107,14 +131,7 @@ export default function HistoryPage() {
                   <article key={item.id || item._id} className="history-card">
                     <div className="history-card__top">
                       <div className="history-card__image">
-                        {item.imageUrl || item.file_foto ? (
-                          <img
-                            src={item.imageUrl || item.file_foto}
-                            alt={item.nama_item || item.name}
-                          />
-                        ) : (
-                          <span>{item.emoji ?? '🥗'}</span>
-                        )}
+                        {renderThumbnail(item)}
                       </div>
 
                       <div className="history-card__info">
@@ -137,9 +154,8 @@ export default function HistoryPage() {
                       <span>
                         {item.status === 'used'
                           ? `Terpakai pada ${formatDate(item.updatedAt || item.date)}`
-                          : `Terbuang pada ${formatDate(item.updatedAt || item.date)}${
-                              item.isExpired ? ' (Kadaluwarsa)' : ''
-                            }`}
+                          : `Terbuang pada ${formatDate(item.updatedAt || item.date)}${item.isExpired ? ' (Kadaluwarsa)' : ''
+                          }`}
                       </span>
 
                       {item.status === 'wasted' && (
@@ -151,10 +167,10 @@ export default function HistoryPage() {
                         </button>
                       )}
                     </div>
-                      </article>
+                  </article>
                 ))}
               </div>
-           </>
+            </>
           )}
         </div>
       </div>
