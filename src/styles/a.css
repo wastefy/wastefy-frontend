@@ -136,13 +136,13 @@
 .filter-tab:hover {
   transform: translateY(-1px);
   border-color: var(--color-accent);
-  color: var(--color-accent);
+  color: #ffffff;
 }
 
 .filter-tab--active {
   background: var(--color-accent);
   border-color: var(--color-accent);
-  color: #fff;
+  color: #ffffff;
   box-shadow: 0 8px 18px rgba(91, 138, 71, 0.25);
 }
 .dark .filter-tab {
