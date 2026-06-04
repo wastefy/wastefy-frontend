@@ -11,7 +11,7 @@ const FILTERS = [
   { label: 'Semua', value: 'all' },
   { label: 'Segar', value: STOCK_STATUS.FRESH },
   { label: 'Segera', value: STOCK_STATUS.SOON },
-  { label: 'Kadaluarsa', value: STOCK_STATUS.EXPIRED },
+  { label: 'Kadaluwarsa', value: STOCK_STATUS.EXPIRED },
 ]
 
 export default function HomePage() {
@@ -29,42 +29,64 @@ export default function HomePage() {
     stockFilter === 'all' ? true : s.status === stockFilter
   )
 
+  const totalFresh = stocks.filter((s) => s.status === STOCK_STATUS.FRESH).length
+  const totalSoon = stocks.filter((s) => s.status === STOCK_STATUS.SOON).length
+  const totalExpired = stocks.filter((s) => s.status === STOCK_STATUS.EXPIRED).length
+
   return (
-    <div className="app-screen">
-      {/* <StatusBar variant="light" /> */}
-      <div className="app-header">
-        <h1 className="app-header__title">Stok Anda</h1>
-        <button
-          className="app-header__icon-btn hide-on-desktop"
-          onClick={() => navigate(SCREENS.SETTINGS)}
-          aria-label="Settings"
-        >
-          <IconSettings />
-        </button>
-      </div>
+    <div className="app-screen page">
+      <div className="container">
+        <div className="home-header">
+          <div>
+            <h1 className="header__title">Your Current Stock</h1>
+          </div>
 
-      <div className="filter-tabs">
-        {FILTERS.map(({ label, value }) => (
           <button
-            key={value}
-            className={`filter-tab ${stockFilter === value ? 'filter-tab--active' : ''}`}
-            onClick={() => setStockFilter(value)}
+            className="header__settings"
+            onClick={() => navigate(SCREENS.SETTINGS)}
+            aria-label="Settings"
           >
-            {label}
+            <IconSettings />
           </button>
-        ))}
+        </div>
       </div>
 
-      <div className="app-content">
-        {filtered.length === 0 ? (
-          <EmptyState
-            image={mascotDashboard}
-            text="Tambahkan item pertama Anda untuk memulai pengelolaan stok makanan yang lebih baik."
-          />
-        ) : (
-          filtered.map((item) => <StockCard key={item.id} item={item} />)
-        )}
-      </div>
+      <div className="toolbar">
+          <div className="filter-tabs">
+            {FILTERS.map(({ label, value }) => (
+              <button
+                key={value}
+                className={`filter-tab ${
+                  stockFilter === value ? 'filter-tab--active' : ''
+                }`}
+                onClick={() => setStockFilter(value)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+          <button
+              className="home-add-btn"
+              onClick={() => setAddModalOpen(true)}
+            >
+              <IconPlus size={35} />
+        </button>
+        </div>
+
+        <div className="app-content home-content">
+          {filtered.length === 0 ? (
+            <EmptyState
+              image={mascotDashboard}
+              text="Tambahkan item pertama Anda untuk memulai pengelolaan stok makanan yang lebih baik."
+            />
+          ) : (
+            <div className="stock-grid">
+              {filtered.map((item) => (
+                <StockCard key={item.id} item={item} />
+              ))}
+            </div>
+          )}
+        </div>
 
       <button
         className="fab"
@@ -75,7 +97,6 @@ export default function HomePage() {
       </button>
 
       {addModalOpen && <AddItemModal />}
-      {successModalOpen && <SuccessModal />}
 
     </div>
   )

@@ -54,13 +54,13 @@
 
 
 /* header */
-.app-header {
+/*.app-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: var(--sp-3) var(--sp-6);
   flex-shrink: 0;
-}
+}*/
 
 .app-header__title {
   font-family: var(--font-display);
@@ -188,14 +188,6 @@
   background: var(--color-text-dark);
   border-color: var(--color-text-dark);
   color: var(--color-bg-app);
-}
-
-/* section label */
-.section-label {
-  font-size: var(--fs-sm);
-  font-weight: var(--fw-bold);
-  color: var(--color-text-dark);
-  margin-bottom: var(--sp-3);
 }
 
 /* animations */
