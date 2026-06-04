@@ -79,7 +79,7 @@ export default function HistoryPage() {
       <div className="container">
         <div className="home-header">
           <div>
-            <h1 className="header__title">History</h1>
+            <h1 className="header__title">Riwayat</h1>
           </div>
 
           <button

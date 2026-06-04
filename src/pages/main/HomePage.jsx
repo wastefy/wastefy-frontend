@@ -38,7 +38,7 @@ export default function HomePage() {
       <div className="container">
         <div className="home-header">
           <div>
-            <h1 className="header__title">Your Current Stock</h1>
+            <h1 className="header__title">Dashboard</h1>
           </div>
 
           <button
