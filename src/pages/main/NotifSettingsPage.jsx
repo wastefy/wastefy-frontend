@@ -12,7 +12,7 @@ export default function NotifSettingsPage() {
   const { goBack, notifSetting, setNotifSetting, saveNotificationToken, deleteNotificationToken } = useApp()
 
   return (
-    <div className="app-screen">
+    <div className="app-screen settings-page container">
       {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
@@ -28,7 +28,7 @@ export default function NotifSettingsPage() {
         </div>
       </div>
 
-      <div className="app-content" style={{ padding: '0 16px 110px' }}>
+      <div style={{ marginTop: 'var(--sp-4)' }}>
         <div className="radio-card">
           {OPTIONS.map(({ label, value }) => (
             <div

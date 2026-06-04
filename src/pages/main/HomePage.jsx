@@ -34,7 +34,7 @@ export default function HomePage() {
   const totalExpired = stocks.filter((s) => s.status === STOCK_STATUS.EXPIRED).length
 
   return (
-    <div className="app-screen page">
+    <div className="app-screen =page">
       <div className="container">
         <div className="home-header">
           <div>
@@ -49,9 +49,7 @@ export default function HomePage() {
             <IconSettings />
           </button>
         </div>
-      </div>
-
-      <div className="toolbar">
+            <div className="toolbar">
           <div className="filter-tabs">
             {FILTERS.map(({ label, value }) => (
               <button
@@ -71,9 +69,9 @@ export default function HomePage() {
             >
               <IconPlus size={35} />
         </button>
-        </div>
+      </div>
 
-        <div className="app-content home-content">
+      <div className="app-content home-content">
           {filtered.length === 0 ? (
             <EmptyState
               image={mascotDashboard}
@@ -86,8 +84,11 @@ export default function HomePage() {
               ))}
             </div>
           )}
-        </div>
+      </div>
 
+      </div>
+
+  
       <button
         className="fab"
         onClick={() => setAddModalOpen(true)}

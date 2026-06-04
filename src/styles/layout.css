@@ -1,16 +1,3 @@
-/* .phone-wrapper {
-  width: 390px;
-  min-height: 844px;
-  background: var(--color-bg-app);
-  border-radius: 48px;
-  box-shadow: var(--shadow-phone);
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  transition: background var(--t-slow), box-shadow var(--t-slow);
-} */
-
 .phone-wrapper {
   width: 100%;
   min-height: 100dvh;
@@ -30,18 +17,6 @@
   }
 }
 
-/* app screen */
-/* .app-screen {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: var(--color-bg-app);
-  min-height: 844px;
-  position: relative;
-  transition: background var(--t-slow);
-} */
-
-
 .app-screen {
   flex: 1;
   display: flex;
@@ -51,16 +26,6 @@
   position: relative;
   transition: background var(--t-slow);
 }
-
-
-/* header */
-/*.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: var(--sp-3) var(--sp-6);
-  flex-shrink: 0;
-}*/
 
 .app-header__title {
   font-family: var(--font-display);
@@ -89,12 +54,6 @@
 }
 
 /* content */
-/* .app-content {
-  flex: 1;
-  padding: 0 var(--sp-4) 110px;
-  overflow-y: auto;
-  max-height: 700px;
-} */
 .app-content {
   flex: 1;
   padding: 0 var(--sp-4) 110px;

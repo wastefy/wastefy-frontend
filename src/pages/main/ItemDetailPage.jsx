@@ -62,7 +62,7 @@ export default function ItemDetailPage() {
   }
 
   return (
-    <div className="app-screen">
+    <div className="app-screen container">
       {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">

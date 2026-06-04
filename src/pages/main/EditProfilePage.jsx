@@ -76,10 +76,10 @@ export default function EditProfilePage() {
     }
   }
   return (
-    <div className="app-screen">
+    <div className="app-screen settings-content container" >
       {/* <StatusBar variant="light" /> */}
 
-      <div className="app-header">
+      <div className="app-header ">
         <div className="app-header__back-row">
           <button className="app-header__icon-btn" onClick={goBack} aria-label="Go back">
             <IconArrowLeft />
@@ -119,7 +119,7 @@ export default function EditProfilePage() {
           </div>
         </div>
 
-        <p className="section-label" style={{ marginTop: 'var(--sp-4)' }}>Akun yang Terhubung</p>
+        <p className="section-label" style={{ marginTop: 'var(--sp-5)', marginBottom: 'var(--sp-4)' }}>Akun yang Terhubung</p>
         <div className="edit-profile-section">
 
           <div className="linked-account-row">
@@ -144,22 +144,29 @@ export default function EditProfilePage() {
             </span>
           </div>
 
-          <div className="linked-account-row" style={{ borderTop: '1px solid var(--color-border)' }}>
+          <div className="linked-account-row">
             <div className="linked-account-row__left">
-              <img
-                src={emailIcon}
-                alt="Email"
-                width={22}
-                height={22}
-                style={{ borderRadius: 4, objectFit: 'contain', flexShrink: 0 }}
-              />
-              <div>
-                <div className="linked-account-row__name">Email</div>
-                <div className="linked-account-row__email">{email}</div>
+
+              <div className="linked-account-row__icon">
+                <img src={emailIcon} alt="Email" />
               </div>
+
+              <div className="linked-account-row__content">
+                <div className="linked-account-row__name">
+                  Email
+                </div>
+
+                <div className="linked-account-row__email">
+                  {email}
+                </div>
+              </div>
+
             </div>
-            <span className="linked-badge linked-badge--linked">Terhubung</span>
-          </div>
+
+            <span className="linked-badge linked-badge--linked">
+              Terhubung
+  </span>
+      </div>
 
         </div>
 

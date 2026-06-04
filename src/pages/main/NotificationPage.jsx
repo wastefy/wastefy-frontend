@@ -37,8 +37,8 @@ export default function NotificationPage() {
               <h1 className="header__title">Notifikasi</h1>
             </div>
           </div>
-          <button
-            className="notification-header__settings"
+           <button
+            className="header__settings"
             onClick={() => navigate(SCREENS.SETTINGS)}
             aria-label="Settings"
           >
