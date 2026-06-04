@@ -342,6 +342,18 @@ body:has(.auth-screen) {
     padding: var(--sp-8);
   }
 
+  .auth-body--centered .auth-title {
+    color: var(--color-text-dark);
+  }
+
+  .auth-body--centered .auth-subtitle {
+    color: var(--color-text-gray);
+  }
+
+  .auth-body--centered .form-label {
+    color: var(--color-text-dark);
+  }
+
   .auth-brand__logo {
     width: 150px;
   }
