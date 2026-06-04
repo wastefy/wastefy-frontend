@@ -12,7 +12,7 @@ export default function NotifSettingsPage() {
   const { goBack, notifSetting, setNotifSetting, saveNotificationToken, deleteNotificationToken } = useApp()
 
   return (
-    <div className="app-screen settings-page container">
+    <div className="app-screen container">
       {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
