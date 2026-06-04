@@ -14,13 +14,6 @@ export default function NotificationPage() {
     <div className="app-screen page">
       <div className="container">
         <div className="notification-header">
-          {/* <div>
-            <p className="notification-header__eyebrow">Notifikasi</p>
-            <h1 className="notification-header__title">Pengingat Stok</h1>
-            <p className="notification-header__subtitle">
-              Pantau item yang mendekati atau sudah melewati masa simpan.
-            </p>
-          </div> */}
 
                  <div className="home-header">
           <div>

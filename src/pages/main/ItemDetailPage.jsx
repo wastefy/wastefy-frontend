@@ -54,7 +54,6 @@ export default function ItemDetailPage() {
 
   return (
     <div className="app-screen">
-      {/* <StatusBar variant="light" /> */}
 
       <div className="app-header">
         <div className="app-header__back-row">

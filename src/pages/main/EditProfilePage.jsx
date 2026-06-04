@@ -1,3 +1,5 @@
+import axios from 'axios'
+import { BASE_URL } from '../../constants'
 import { useState } from 'react'
 import { useApp } from '../../context/AppContext'
 import StatusBar from '../../components/layout/StatusBar'
@@ -18,23 +20,60 @@ function getInitials(name = '') {
 
 export default function EditProfilePage() {
   const { goBack, profile, updateProfile } = useApp()
-
-  const [name, setName]                 = useState(profile.name)
-  const [email, setEmail]               = useState(profile.email)
+  const [name, setName] = useState(profile.name)
+  const [email, setEmail] = useState(profile.email)
   const [linkedGoogle, setLinkedGoogle] = useState(profile.linkedGoogle)
 
   const initials = getInitials(name) || '?'
 
-  const handleSave = () => {
-    updateProfile({
-      name:         name.trim()  || profile.name,
-      email:        email.trim() || profile.email,
-      avatarUrl:    null,
-      linkedGoogle,
-    })
-    goBack()
+  const handleSave = async () => {
+    try {
+      const { auth } = await import('../../config/firebase')
+      const freshToken = await auth.currentUser?.getIdToken(true)
+      const token = freshToken || localStorage.getItem('token')
+
+      await axios.put(`${BASE_URL}/api/auth/profile`, {
+        nama: name.trim() || profile.name,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      updateProfile({
+        name: name.trim() || profile.name,
+        email: email.trim() || profile.email,
+        avatarUrl: null,
+        linkedGoogle,
+      })
+      goBack()
+    } catch (error) {
+      console.log('Status:', error.response?.status)
+      console.log('Message:', error.response?.data)
+      alert('Gagal menyimpan profil. Silakan coba lagi.')
+    }
   }
 
+  const handleLinkGoogle = async () => {
+    if (linkedGoogle) return
+
+    try {
+      const { auth } = await import('../../config/firebase')
+      const { GoogleAuthProvider, linkWithPopup } = await import('firebase/auth')
+
+      const provider = new GoogleAuthProvider()
+      await linkWithPopup(auth.currentUser, provider)
+
+      setLinkedGoogle(true)
+      localStorage.setItem('linkedGoogle', 'true')
+      alert('Akun Google berhasil dihubungkan!')
+    } catch (error) {
+      if (error.code === 'auth/provider-already-linked' ||
+        error.code === 'auth/credential-already-in-use') {
+        setLinkedGoogle(true)
+        localStorage.setItem('linkedGoogle', 'true')
+      } else {
+        alert('Gagal menghubungkan Google. Coba lagi.')
+      }
+    }
+  }
   return (
     <div className="app-screen">
       {/* <StatusBar variant="light" /> */}

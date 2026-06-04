@@ -1,12 +1,50 @@
 import { useState } from 'react'
+import axios from 'axios'
 import { useApp } from '../../context/AppContext'
 import { SCREENS } from '../../constants'
+import { BASE_URL } from '../../constants'
 import setPasswordIcon from '../../assets/images/icon-set new password.png'
 
 export default function SetPasswordPage() {
   const { navigate } = useApp()
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const handleReset = async () => {
+    if (!password || !confirm) {
+      setErrorMessage('Semua field harus diisi.')
+      return
+    }
+    if (password !== confirm) {
+      setErrorMessage('Kata sandi tidak cocok.')
+      return
+    }
+
+    const email = localStorage.getItem('resetEmail')
+    if (!email) {
+      setErrorMessage('Sesi tidak valid. Ulangi dari lupa kata sandi.')
+      return
+    }
+
+    try {
+      setLoading(true)
+      setErrorMessage('')
+      await axios.post(`${BASE_URL}/api/auth/reset-password`, {
+        email,
+        newPassword: password
+      })
+
+      localStorage.removeItem('resetEmail') // bersihkan sesi
+      alert('Kata sandi berhasil diatur ulang. Silakan masuk.')
+      navigate(SCREENS.LOGIN)
+    } catch (error) {
+      setErrorMessage(error.response?.data?.message || 'Gagal mengatur ulang kata sandi.')
+    } finally {
+      setLoading(false)
+    }
+  }
 
   return (
     <div className="auth-screen auth-screen--centered">
@@ -42,8 +80,8 @@ export default function SetPasswordPage() {
           />
         </div>
 
-        <button className="btn btn--primary" onClick={() => navigate(SCREENS.HOME)}>
-          Atur Ulang Kata Sandi
+        <button className="btn btn--primary" onClick={handleReset} disabled={loading}>
+          {loading ? 'Menyimpan...' : 'Atur Ulang Kata Sandi'}
         </button>
       </div>
     </div>

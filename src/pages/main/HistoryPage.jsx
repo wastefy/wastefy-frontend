@@ -5,12 +5,19 @@ import EmptyState from '../../components/common/EmptyState'
 import StatusBadge from '../../components/common/StatusBadge'
 import { IconSettings } from '../../components/common/Icons'
 import mascotHistory from '../../assets/images/mascot-history.png'
+import assetBuah from '../../assets/images/default-buah.png'
+import assetSayur from '../../assets/images/default-sayur.png'
 
+const DEFAULT_ASSET = {
+  Buah: assetBuah,
+  Sayur: assetSayur,
+}
 const FILTERS = [
   { label: 'Semua', value: 'all' },
   { label: 'Terpakai', value: 'used' },
   { label: 'Terbuang', value: 'wasted' },
 ]
+
 
 export default function HistoryPage() {
   const {
@@ -34,12 +41,8 @@ export default function HistoryPage() {
     return item?.status?.toLowerCase() === historyFilter?.toLowerCase()
   })
 
-  const totalUsed = history.filter((item) => item?.status === 'used').length
-  const totalWasted = history.filter((item) => item?.status === 'wasted').length
-
   const formatDate = (dateString) => {
     if (!dateString) return '—'
-
     return new Date(dateString).toLocaleDateString('id-ID', {
       day: 'numeric',
       month: 'long',

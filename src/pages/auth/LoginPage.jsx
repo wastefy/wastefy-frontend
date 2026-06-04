@@ -6,13 +6,27 @@ import googleIcon from '../../assets/images/icon-google.png'
 import emailIcon from '../../assets/images/icon-email.png'
 
 export default function LoginPage() {
-  // Ambil 'loginUser' dan 'authLoading' dari AppContext
-  const { navigate, loginUser, authLoading } = useApp()
+    const { navigate, loginUser, loginWithGoogle, loginWithEmailLink, authLoading } = useApp()
   const [email, setEmail] = useState('')
+  const [emailLinkInput, setEmailLinkInput] = useState('')
+  const [emailLinkSent, setEmailLinkSent] = useState(false)
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState('')
 
-  // Fungsi untuk menangani submit login
+  const handleGoogleLogin = async () => {
+    const result = await loginWithGoogle()
+    if (result.success) navigate(SCREENS.HOME)
+    else setErrorMessage(result.message)
+  }
+
+  const handleEmailLink = async () => {
+    const emailInput = prompt('Masukkan email Anda untuk menerima link masuk:')
+    if (!emailInput) return
+    const result = await loginWithEmailLink(emailInput)
+    if (result.success) alert(result.message)
+    else setErrorMessage(result.message)
+  }
+
   const handleLoginSubmit = async (e) => {
     if (e) e.preventDefault()
     setErrorMessage('')
@@ -22,11 +36,10 @@ export default function LoginPage() {
       return
     }
 
-    // Panggil fungsi login yang terhubung ke Firebase & LocalStorage
     const result = await loginUser(email, password)
 
     if (result && result.success) {
-      navigate(SCREENS.HOME) // Berhasil masuk ke Dashboard
+      navigate(SCREENS.HOME)
     } else {
       setErrorMessage(result?.message || 'Gagal masuk. Periksa kembali email dan password Anda.')
     }
@@ -74,7 +87,6 @@ export default function LoginPage() {
       </div>
 
       <div className="auth-actions">
-        {/* PERBAIKAN: Menggunakan handleLoginSubmit saat diklik */}
         <button 
           className="btn btn--primary" 
           onClick={handleLoginSubmit}
@@ -85,16 +97,16 @@ export default function LoginPage() {
 
         <div className="auth-divider"><span>or</span></div>
 
-        <div className="auth-social-row">
-          <button className="btn btn--social" disabled={authLoading}>
+      <div className="auth-social-row">
+          <button className="btn btn--social" onClick={handleGoogleLogin} disabled={authLoading}>
             <img src={googleIcon} alt="Google" className="btn__icon" />
             <span>Google</span>
           </button>
-          <button className="btn btn--social" disabled={authLoading}>
+          <button className="btn btn--social" onClick={() => navigate(SCREENS.LOGIN_EMAIL)} disabled={authLoading}>
             <img src={emailIcon} alt="Email" className="btn__icon" />
             <span>Email</span>
           </button>
-        </div>
+        </div>        
 
         <p className="auth-footer-link">
           Belum punya akun?{' '}
