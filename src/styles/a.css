@@ -136,7 +136,7 @@
 .filter-tab:hover {
   transform: translateY(-1px);
   border-color: var(--color-accent);
-  color: #ffffff;
+  color: var(--color-accent);
 }
 
 .filter-tab--active {
