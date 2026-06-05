@@ -29,6 +29,7 @@ export function AppProvider({ children }) {
   })
   const [notifSetting, setNotifSetting] = useState('allow')
   const [authLoading, setAuthLoading] = useState(false)
+  const [initLoading, setInitLoading] = useState(!!localStorage.getItem('token'))
 
   const navigate = (to) => { setPrevScreen(screen); setScreen(to); sessionStorage.setItem('lastScreen', to) }
   const goBack = () => {
@@ -69,6 +70,8 @@ export function AppProvider({ children }) {
         avatarUrl: userCredential.user.photoURL || null,
       }))
 
+      await saveNotificationToken()
+      navigate(SCREENS.HOME)
       return { success: true }
     } catch (error) {
       console.error('Google login error:', error)
@@ -187,9 +190,9 @@ export function AppProvider({ children }) {
         name: user.displayName || prev.name
       }))
 
-      await saveNotificationToken();
-
-      return { success: true, user }
+      await saveNotificationToken()
+      navigate(SCREENS.HOME)
+      return { success: true }
     } catch (error) {
       console.error("Firebase Auth Error:", error)
       let errorMessage = error.message || 'Gagal masuk. Periksa kembali jaringan atau kredensial Anda.'
@@ -207,7 +210,7 @@ export function AppProvider({ children }) {
   const logoutUser = () => {
     localStorage.removeItem('token')
     sessionStorage.removeItem('lastScreen')
-    localStorage.removeItem('linkedGoogle') 
+    localStorage.removeItem('linkedGoogle')
     localStorage.removeItem('darkMode')
     setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
     setStocks([])
@@ -296,22 +299,56 @@ export function AppProvider({ children }) {
   }
 
   useEffect(() => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      const lastScreen = sessionStorage.getItem('lastScreen')
-      // Hanya restore screen yang valid untuk user yang sudah login
-      const validScreens = [SCREENS.HOME, SCREENS.HISTORY, SCREENS.NOTIFICATION, SCREENS.SETTINGS]
-      const screenToGo = validScreens.includes(lastScreen) ? lastScreen : SCREENS.HOME
+    const initAuth = async () => {
+      const storedToken = localStorage.getItem('token')
+      if (!storedToken) {
+        setInitLoading(false)
+        return
+      }
 
-      setScreen(screenToGo)
-      if (screenToGo === SCREENS.HOME) setActiveTab(TABS.HOME)
-      else if (screenToGo === SCREENS.HISTORY) setActiveTab(TABS.HISTORY)
-      else if (screenToGo === SCREENS.NOTIFICATION) setActiveTab(TABS.NOTIFICATION)
-      else setActiveTab(TABS.HOME)
-      fetchStocks()
-      fetchInventorySummary()
-      fetchProfile()
+      try {
+        await new Promise((resolve) => {
+          const unsubscribe = auth.onAuthStateChanged((user) => {
+            unsubscribe()
+            resolve(user)
+          })
+        })
+
+        const currentUser = auth.currentUser
+        if (!currentUser) {
+          localStorage.removeItem('token')
+          sessionStorage.removeItem('lastScreen')
+          setScreen(SCREENS.LANDING)
+          return
+        }
+
+        const freshToken = await currentUser.getIdToken(true)
+        localStorage.setItem('token', freshToken)
+
+        const lastScreen = sessionStorage.getItem('lastScreen')
+        const validScreens = [SCREENS.HOME, SCREENS.HISTORY, SCREENS.NOTIFICATION, SCREENS.SETTINGS]
+        const screenToGo = validScreens.includes(lastScreen) ? lastScreen : SCREENS.HOME
+
+        setScreen(screenToGo)
+        if (screenToGo === SCREENS.HOME) setActiveTab(TABS.HOME)
+        else if (screenToGo === SCREENS.HISTORY) setActiveTab(TABS.HISTORY)
+        else if (screenToGo === SCREENS.NOTIFICATION) setActiveTab(TABS.NOTIFICATION)
+        else setActiveTab(TABS.HOME)
+
+        fetchStocks()
+        fetchInventorySummary()
+        fetchProfile()
+      } catch (error) {
+        console.error('Auth init error:', error)
+        localStorage.removeItem('token')
+        sessionStorage.removeItem('lastScreen')
+        setScreen(SCREENS.LANDING)
+      } finally {
+        setInitLoading(false)
+      }
     }
+
+    initAuth()
   }, [])
 
   const fetchHistory = async () => {
@@ -503,7 +540,7 @@ export function AppProvider({ children }) {
     setStocks,
     registerUser,
     loginUser, loginWithGoogle, loginWithEmailLink,
-    authLoading,
+    authLoading, initLoading,
     fetchHistory, fetchNotifications,
     logoutUser,
     saveNotificationToken,
