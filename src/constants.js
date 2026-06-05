@@ -24,9 +24,9 @@ export const TABS = {
 }
 
 export const STOCK_STATUS = {
-  FRESH:   'Segar',
-  SOON:    'Segera',
-  EXPIRED: 'Kadaluarsa',
+  FRESH:   'fresh',
+  SOON:    'soon',
+  EXPIRED: 'expired',
 }
 
 export const HISTORY_STATUS = {
