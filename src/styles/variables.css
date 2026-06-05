@@ -1,0 +1,119 @@
+/* light mode (default) */
+
+:root,
+[data-theme="light"] {
+  --color-primary:        #595A57;
+  --color-primary-dark:   #2E4428;
+  --color-accent:         #5B8A47;
+  --color-accent-hover:   #4E7A3C;
+
+  --color-bg-auth:        #2E4428;
+  --color-bg-app:         #FFFFFF;
+  --color-bg-input:       #E8E4DC;
+  --color-bg-input-focus: #DDD9D1;
+  --color-bg-empty:       #ECEAE4;
+  --color-bg-card:        #FFFFFF;
+  --color-bg-page:        #F7F5F1;
+
+  --color-text-inverse:   #F5F0E8;
+  --color-text-dark:      #1A1A1A;
+  --color-text-gray:      #6B6B6B;
+  --color-text-muted:     #9A9A8A;
+
+  --color-fresh:          #4CAF50;
+  --color-soon:           #FFC107;
+  --color-expired:        #F44336;
+  --color-used:           #4CAF50;
+  --color-wasted:         #F44336;
+
+  --color-btn-used:       #4CAF50;
+  --color-btn-throw:      #F44336;
+  --color-btn-edit:       #757575;
+  --color-btn-addback:    #1565C0;
+
+  --color-navbar-bg:      #2E4428;
+  --color-navbar-icon:    rgba(200, 213, 190, 0.8);
+  --color-navbar-active:  #FFFFFF;
+
+  --color-border:         #F0EDE8;
+  --color-divider:        #E8E4DC;
+
+  --shadow-card:  0 2px 12px rgba(0, 0, 0, 0.07);
+  --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.18);
+  --shadow-btn:   0 3px 10px rgba(91, 138, 71, 0.35);
+  --shadow-fab:   0 4px 18px rgba(91, 138, 71, 0.45);
+  --shadow-phone: 0 24px 80px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 0, 0, 0.08);
+}
+
+/* dark mode */
+[data-theme="dark"] {
+  --color-bg-auth:        #2E4428;
+  --color-bg-app:         #121212;
+  --color-bg-input:       #2A2A2A;
+  --color-bg-input-focus: #3a3a3a;
+  --color-bg-empty:       #1E1E1E;
+  --color-bg-card:        #1E1E1E;
+  --color-bg-page:        #121212;
+
+  --color-text-inverse:   #F5F0E8;
+  --color-text-dark:      #F0EDE8;
+  --color-text-gray:      #A0A0A0;
+  --color-text-muted:     #6B6B6B;
+
+  --color-border:         #2A2A2A;
+  --color-divider:        #2A2A2A;
+
+  --shadow-card:  0 2px 12px rgba(0, 0, 0, 0.3);
+  --shadow-modal: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-phone: 0 24px 80px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(255,255,255,0.06);
+}
+
+/* typography */
+:root {
+  --font-display: 'Celias', serif;
+  --font-body:    'Avenir', system-ui, sans-serif;
+
+  --fs-xs:   11px;
+  --fs-sm:   13px;
+  --fs-base: 15px;
+  --fs-md:   17px;
+  --fs-lg:   20px;
+  --fs-xl:   24px;
+
+  --fw-light:     300;
+  --fw-regular:   400;
+  --fw-medium:    500;
+  --fw-semibold:  600;
+  --fw-bold:      700;
+  --fw-extrabold: 800;
+
+  --sp-1:  4px;  --sp-2:  8px;  --sp-3:  12px; --sp-4:  16px;
+  --sp-5:  20px; --sp-6:  24px; --sp-7:  28px; --sp-8:  32px;
+  --sp-10: 40px; --sp-12: 48px;
+
+  --radius-sm:   8px;  --radius-md:  12px;
+  --radius-lg:   16px; --radius-xl:  22px;
+  --radius-2xl:  28px; --radius-full: 999px;
+
+  --t-fast:   0.15s ease;
+  --t-base:   0.2s ease;
+  --t-slow:   0.3s ease;
+  --t-spring: 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+/* font */
+@font-face {
+  font-family: 'Celias';
+  src: url('../assets/fonts/Celias-Exfontb240.otf') format('opentype');
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Avenir';
+  src: url('../assets/fonts/Avenir LT Std Heavy.otf') format('opentype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
