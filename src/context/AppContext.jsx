@@ -1,109 +1,103 @@
-import axios from "axios";
-import { createContext, useContext, useState, useEffect } from "react";
-import { SCREENS, TABS, BASE_URL } from "../constants";
-import api from "../utils/axiosInstance";
+import axios from 'axios'
+import { createContext, useContext, useState, useEffect } from 'react'
+import { SCREENS, TABS, BASE_URL } from '../constants'
+import api from '../utils/axiosInstance'
 import {
-  signInWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult,
-  GoogleAuthProvider,
-  sendSignInLinkToEmail,
-  isSignInWithEmailLink,
-  signInWithEmailLink,
-} from "firebase/auth";
-import { auth } from "../config/firebase";
+  signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
+  sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
+} from 'firebase/auth'
+import { auth } from '../config/firebase'
 import { getToken, onMessage } from "firebase/messaging";
 import { messaging } from "../config/firebase";
 
-const AppContext = createContext(null);
+
+const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
-  const [screen, setScreen] = useState(SCREENS.LANDING);
-  const [prevScreen, setPrevScreen] = useState(null);
-  const [activeTab, setActiveTab] = useState(TABS.HOME);
-  const [stocks, setStocks] = useState([]);
-  const [stockFilter, setStockFilter] = useState("all");
-  const [history, setHistory] = useState([]);
-  const [historyFilter, setHistoryFilter] = useState("all");
-  const [notifications, setNotifications] = useState([]);
-  const [addModalOpen, setAddModalOpen] = useState(false);
-  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [screen, setScreen] = useState(SCREENS.LANDING)
+  const [prevScreen, setPrevScreen] = useState(null)
+  const [activeTab, setActiveTab] = useState(TABS.HOME)
+  const [stocks, setStocks] = useState([])
+  const [stockFilter, setStockFilter] = useState('all')
+  const [history, setHistory] = useState([])
+  const [historyFilter, setHistoryFilter] = useState('all')
+  const [notifications, setNotifications] = useState([])
+  const [addModalOpen, setAddModalOpen] = useState(false)
+  const [successModalOpen, setSuccessModalOpen] = useState(false)
   const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("darkMode") === "true";
-  });
-  const [notifSetting, setNotifSetting] = useState("allow");
-  const [authLoading, setAuthLoading] = useState(false);
-  const [initLoading, setInitLoading] = useState(true);
+    return localStorage.getItem('darkMode') === 'true'
+  })
+  const [notifSetting, setNotifSetting] = useState('allow')
+  const [authLoading, setAuthLoading] = useState(false)
+  const [initLoading, setInitLoading] = useState(true)
 
-  const navigate = (to) => {
-    setPrevScreen(screen);
-    setScreen(to);
-    sessionStorage.setItem("lastScreen", to);
-  };
+  const navigate = (to) => { setPrevScreen(screen); setScreen(to); sessionStorage.setItem('lastScreen', to) }
   const goBack = () => {
-    if (prevScreen) {
-      setScreen(prevScreen);
-      setPrevScreen(null);
-    } else setScreen(SCREENS.LANDING);
-  };
+    if (prevScreen) { setScreen(prevScreen); setPrevScreen(null) }
+    else setScreen(SCREENS.LANDING)
+  }
   const switchTab = (tab) => {
-    setActiveTab(tab);
-    navigate(
-      {
-        home: SCREENS.HOME,
-        notification: SCREENS.NOTIFICATION,
-        history: SCREENS.HISTORY,
-      }[tab],
-    );
-  };
+    setActiveTab(tab)
+    navigate({ home: SCREENS.HOME, notification: SCREENS.NOTIFICATION, history: SCREENS.HISTORY }[tab])
+  }
 
   const [profile, setProfile] = useState({
-    name: "Your Name",
-    email: "yourname@gmail.com",
-    avatarUrl: null,
-    linkedGoogle: false,
-  });
+    name: 'Your Name', email: 'yourname@gmail.com',
+    avatarUrl: null, linkedGoogle: false,
+  })
 
+  // SESUDAH
   const loginWithGoogle = async () => {
     try {
-      setAuthLoading(true);
-      const provider = new GoogleAuthProvider();
-      provider.setCustomParameters({ prompt: "select_account" });
-      await signInWithRedirect(auth, provider);
+      setAuthLoading(true)
+      const provider = new GoogleAuthProvider()
+      provider.setCustomParameters({ prompt: 'select_account' })
+
+      const result = await signInWithPopup(auth, provider)  // ← ganti ini
+
+      const token = await result.user.getIdToken()
+      localStorage.setItem('token', token)
+
+      await axios.post(`${BASE_URL}/api/auth/login`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+
+      setProfile(prev => ({
+        ...prev,
+        email: result.user.email,
+        name: result.user.displayName || prev.name,
+        avatarUrl: result.user.photoURL || null,
+      }))
+
+      await saveNotificationToken()
+      setActiveTab(TABS.HOME)
+      navigate(SCREENS.HOME)
+      return { success: true }
     } catch (error) {
-      console.error("Google login error:", error);
-      setAuthLoading(false);
-      return {
-        success: false,
-        message: error.message || "Gagal masuk dengan Google.",
-      };
+      console.error('Google login error:', error)
+      return { success: false, message: error.message || 'Gagal masuk dengan Google.' }
+    } finally {
+      setAuthLoading(false)
     }
-  };
+  }
 
   const loginWithEmailLink = async (email) => {
     try {
-      setAuthLoading(true);
+      setAuthLoading(true)
       const actionCodeSettings = {
         url: window.location.href,
         handleCodeInApp: true,
-      };
-      await sendSignInLinkToEmail(auth, email, actionCodeSettings);
-      localStorage.setItem("emailForSignIn", email);
-      return {
-        success: true,
-        message: "Link masuk telah dikirim ke email Anda.",
-      };
+      }
+      await sendSignInLinkToEmail(auth, email, actionCodeSettings)
+      localStorage.setItem('emailForSignIn', email)
+      return { success: true, message: 'Link masuk telah dikirim ke email Anda.' }
     } catch (error) {
-      console.error("Email link error:", error);
-      return {
-        success: false,
-        message: "Gagal mengirim link. Periksa email Anda.",
-      };
+      console.error('Email link error:', error)
+      return { success: false, message: 'Gagal mengirim link. Periksa email Anda.' }
     } finally {
-      setAuthLoading(false);
+      setAuthLoading(false)
     }
-  };
+  }
 
   const saveNotificationToken = async () => {
     try {
@@ -125,7 +119,7 @@ export function AppProvider({ children }) {
           headers: {
             Authorization: `Bearer ${firebaseToken}`,
           },
-        },
+        }
       );
 
       console.log("FCM Token saved");
@@ -136,14 +130,14 @@ export function AppProvider({ children }) {
 
   const deleteNotificationToken = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token')
       await axios.delete(`${BASE_URL}/api/notifications/token`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        headers: { Authorization: `Bearer ${token}` }
+      })
     } catch (err) {
-      console.error("Delete token error:", err);
+      console.error('Delete token error:', err)
     }
-  };
+  }
 
   const checkNotification = async () => {
     try {
@@ -155,7 +149,7 @@ export function AppProvider({ children }) {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-        },
+        }
       );
     } catch (err) {
       console.error("Trigger Check Error:", err);
@@ -168,105 +162,77 @@ export function AppProvider({ children }) {
       const response = await axios.post(`${BASE_URL}/api/auth/register`, {
         nama: name,
         email,
-        password,
+        password
       });
 
-      if (
-        response.data.success ||
-        response.status === 200 ||
-        response.status === 201
-      ) {
-        return {
-          success: true,
-          message: response.data.message || "Pendaftaran berhasil.",
-        };
+      if (response.data.success || response.status === 200 || response.status === 201) {
+        return { success: true, message: response.data.message || 'Pendaftaran berhasil.' };
       }
     } catch (error) {
-      const errorMessage =
-        error.response?.data?.message ||
-        "Terjadi kesalahan pada server saat registrasi.";
+      const errorMessage = error.response?.data?.message || 'Terjadi kesalahan pada server saat registrasi.';
       return { success: false, message: errorMessage };
     } finally {
       setAuthLoading(false);
     }
-  };
+  }
 
   const loginUser = async (email, password) => {
     try {
-      setAuthLoading(true);
-      const userCredential = await signInWithEmailAndPassword(
-        auth,
-        email,
-        password,
-      );
-      const user = userCredential.user;
+      setAuthLoading(true)
+      const userCredential = await signInWithEmailAndPassword(auth, email, password)
+      const user = userCredential.user
 
-      const token = await user.getIdToken();
-      localStorage.setItem("token", token);
+      const token = await user.getIdToken()
+      localStorage.setItem('token', token)
 
       setProfile((prev) => ({
         ...prev,
         email: user.email,
-        name: user.displayName || prev.name,
-      }));
+        name: user.displayName || prev.name
+      }))
 
-      await saveNotificationToken();
-      navigate(SCREENS.HOME);
-      return { success: true };
+      await saveNotificationToken()
+      navigate(SCREENS.HOME)
+      return { success: true }
     } catch (error) {
-      console.error("Firebase Auth Error:", error);
-      let errorMessage =
-        error.message ||
-        "Gagal masuk. Periksa kembali jaringan atau kredensial Anda.";
-      if (
-        error.code === "auth/user-not-found" ||
-        error.code === "auth/wrong-password" ||
-        error.code === "auth/invalid-credential"
-      ) {
-        errorMessage = "Email atau kata sandi salah.";
-      } else if (error.code === "auth/invalid-email") {
-        errorMessage = "Format email tidak valid.";
+      console.error("Firebase Auth Error:", error)
+      let errorMessage = error.message || 'Gagal masuk. Periksa kembali jaringan atau kredensial Anda.'
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        errorMessage = 'Email atau kata sandi salah.'
+      } else if (error.code === 'auth/invalid-email') {
+        errorMessage = 'Format email tidak valid.'
       }
-      return { success: false, message: errorMessage };
+      return { success: false, message: errorMessage }
     } finally {
-      setAuthLoading(false);
+      setAuthLoading(false)
     }
-  };
+  }
 
   const logoutUser = () => {
-    localStorage.removeItem("token");
-    sessionStorage.removeItem("lastScreen");
-    localStorage.removeItem("linkedGoogle");
-    localStorage.removeItem("darkMode");
-    setProfile({
-      name: "Your Name",
-      email: "yourname@gmail.com",
-      avatarUrl: null,
-      linkedGoogle: false,
-    });
-    setStocks([]);
-    setHistory([]);
-    setNotifications([]);
-    setScreen(SCREENS.LANDING);
-    setPrevScreen(null);
-  };
+    localStorage.removeItem('token')
+    sessionStorage.removeItem('lastScreen')
+    localStorage.removeItem('linkedGoogle')
+    localStorage.removeItem('darkMode')
+    setProfile({ name: 'Your Name', email: 'yourname@gmail.com', avatarUrl: null, linkedGoogle: false })
+    setStocks([])
+    setHistory([])
+    setNotifications([])
+    setScreen(SCREENS.LANDING)
+    setPrevScreen(null)
+  }
 
-  const [selectedItem, setSelectedItem] = useState(null);
-  const updateProfile = (fields) =>
-    setProfile((prev) => ({ ...prev, ...fields }));
+  const [selectedItem, setSelectedItem] = useState(null)
+  const updateProfile = (fields) => setProfile((prev) => ({ ...prev, ...fields }))
 
   useEffect(() => {
-    document.documentElement.setAttribute(
-      "data-theme",
-      darkMode ? "dark" : "light",
-    );
-    localStorage.setItem("darkMode", darkMode);
-  }, [darkMode]);
+    document.documentElement.setAttribute('data-theme', darkMode ? 'dark' : 'light')
+    localStorage.setItem('darkMode', darkMode)
+  }, [darkMode])
 
   const openItemDetail = (item) => {
-    setSelectedItem(item);
-    navigate(SCREENS.ITEM_DETAIL);
-  };
+    setSelectedItem(item)
+    navigate(SCREENS.ITEM_DETAIL)
+  }
 
   const [inventorySummary, setInventorySummary] = useState(null);
 
@@ -278,197 +244,177 @@ export function AppProvider({ children }) {
     storedIn: raw.lokasi_penyimpanan,
     buyDate: raw.tanggal_beli,
     status: raw.status?.toLowerCase(),
-    category: raw.jenis_item ?? raw.kategori ?? raw.category ?? "Lainnya",
+    category: raw.jenis_item ?? raw.kategori ?? raw.category ?? 'Lainnya',
     imageUrl: raw.foto_url ?? raw.imageUrl ?? null,
     shelfDays: raw.sisa_hari ?? raw.shelf_days ?? null,
-  });
+  })
 
   const fetchStocks = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const response = await axios.get(`${BASE_URL}/api/inventory`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setStocks((response.data.items || []).map(mapItem));
     } catch (error) {
-      console.error("Error fetching stocks:", error);
+      console.error('Error fetching stocks:', error);
     }
-  };
+  }
 
   const fetchInventorySummary = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const response = await axios.get(`${BASE_URL}/api/inventory/summary`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setInventorySummary(response.data);
     } catch (error) {
-      console.error("Error fetching inventory summary:", error);
+      console.error('Error fetching inventory summary:', error);
     }
-  };
+  }
 
   const fetchProfile = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token')
       const response = await axios.get(`${BASE_URL}/api/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      const user = response.data;
+      })
+      const user = response.data
 
-      const { auth } = await import("../config/firebase");
-      const providerIds =
-        auth.currentUser?.providerData?.map((p) => p.providerId) || [];
-      const isGoogleLinked =
-        providerIds.includes("google.com") ||
-        localStorage.getItem("linkedGoogle") === "true";
+      const { auth } = await import('../config/firebase')
+      const providerIds = auth.currentUser?.providerData?.map(p => p.providerId) || []
+      const isGoogleLinked = providerIds.includes('google.com') || localStorage.getItem('linkedGoogle') === 'true'
 
-      setProfile((prev) => ({
+      setProfile(prev => ({
         ...prev,
         name: user.nama || prev.name,
         email: user.email || prev.email,
         linkedGoogle: isGoogleLinked,
-      }));
+      }))
     } catch (err) {
-      console.error("Gagal fetch profile:", err);
+      console.error('Gagal fetch profile:', err)
     }
-  };
+  }
 
   useEffect(() => {
     const initAuth = async () => {
       // 1. Cek redirect Google DULU, sebelum cek token
       try {
-        const redirectResult = await getRedirectResult(auth);
+        const redirectResult = await getRedirectResult(auth)
         if (redirectResult) {
-          const isLinking = localStorage.getItem("linkingGoogle");
+          const isLinking = localStorage.getItem('linkingGoogle')
           if (isLinking) {
-            localStorage.removeItem("linkingGoogle");
-            localStorage.setItem("linkedGoogle", "true");
-            setInitLoading(false);
-            return;
+            localStorage.removeItem('linkingGoogle')
+            localStorage.setItem('linkedGoogle', 'true')
+            setInitLoading(false)
+            return
           }
-          const token = await redirectResult.user.getIdToken();
-          localStorage.setItem("token", token);
-          await axios.post(
-            `${BASE_URL}/api/auth/login`,
-            {},
-            {
-              headers: { Authorization: `Bearer ${token}` },
-            },
-          );
-          setProfile((prev) => ({
+          const token = await redirectResult.user.getIdToken()
+          localStorage.setItem('token', token)
+          await axios.post(`${BASE_URL}/api/auth/login`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          setProfile(prev => ({
             ...prev,
             email: redirectResult.user.email,
             name: redirectResult.user.displayName || prev.name,
             avatarUrl: redirectResult.user.photoURL || null,
-          }));
-          await saveNotificationToken();
-          navigate(SCREENS.HOME);
-          setInitLoading(false);
-          return;
+          }))
+          await saveNotificationToken()
+          setActiveTab(TABS.HOME)
+          navigate(SCREENS.HOME)
+          setInitLoading(false)
+          return
         }
       } catch (e) {
-        console.error("Redirect result error:", e);
+        console.error('Redirect result error:', e)
       }
 
       // 2. Baru cek token seperti biasa
-      const storedToken = localStorage.getItem("token");
+      const storedToken = localStorage.getItem('token')
       if (!storedToken) {
-        setInitLoading(false);
-        return;
+        setInitLoading(false)
+        return
       }
 
       try {
         await new Promise((resolve) => {
           const unsubscribe = auth.onAuthStateChanged((user) => {
-            unsubscribe();
-            resolve(user);
-          });
-        });
+            unsubscribe()
+            resolve(user)
+          })
+        })
 
-        const currentUser = auth.currentUser;
+        const currentUser = auth.currentUser
         if (!currentUser) {
-          localStorage.removeItem("token");
-          sessionStorage.removeItem("lastScreen");
-          setScreen(SCREENS.LANDING);
-          return;
+          localStorage.removeItem('token')
+          sessionStorage.removeItem('lastScreen')
+          setScreen(SCREENS.LANDING)
+          return
         }
 
-        const freshToken = await currentUser.getIdToken(true);
-        localStorage.setItem("token", freshToken);
+        const freshToken = await currentUser.getIdToken(true)
+        localStorage.setItem('token', freshToken)
 
-        const lastScreen = sessionStorage.getItem("lastScreen");
-        const validScreens = [
-          SCREENS.HOME,
-          SCREENS.HISTORY,
-          SCREENS.NOTIFICATION,
-          SCREENS.SETTINGS,
-        ];
-        const screenToGo = validScreens.includes(lastScreen)
-          ? lastScreen
-          : SCREENS.HOME;
+        const lastScreen = sessionStorage.getItem('lastScreen')
+        const validScreens = [SCREENS.HOME, SCREENS.HISTORY, SCREENS.NOTIFICATION, SCREENS.SETTINGS]
+        const screenToGo = validScreens.includes(lastScreen) ? lastScreen : SCREENS.HOME
 
-        setScreen(screenToGo);
-        if (screenToGo === SCREENS.HOME) setActiveTab(TABS.HOME);
-        else if (screenToGo === SCREENS.HISTORY) setActiveTab(TABS.HISTORY);
-        else if (screenToGo === SCREENS.NOTIFICATION)
-          setActiveTab(TABS.NOTIFICATION);
-        else setActiveTab(TABS.HOME);
+        setScreen(screenToGo)
+        if (screenToGo === SCREENS.HOME) setActiveTab(TABS.HOME)
+        else if (screenToGo === SCREENS.HISTORY) setActiveTab(TABS.HISTORY)
+        else if (screenToGo === SCREENS.NOTIFICATION) setActiveTab(TABS.NOTIFICATION)
+        else setActiveTab(TABS.HOME)
 
-        fetchStocks();
-        fetchInventorySummary();
-        fetchProfile();
+        fetchStocks()
+        fetchInventorySummary()
+        fetchProfile()
       } catch (error) {
-        console.error("Auth init error:", error);
-        localStorage.removeItem("token");
-        sessionStorage.removeItem("lastScreen");
-        setScreen(SCREENS.LANDING);
+        console.error('Auth init error:', error)
+        localStorage.removeItem('token')
+        sessionStorage.removeItem('lastScreen')
+        setScreen(SCREENS.LANDING)
       } finally {
-        setInitLoading(false);
+        setInitLoading(false)
       }
-    };
+    }
 
-    initAuth();
-  }, []);
+    initAuth()
+  }, [])
 
   const fetchHistory = async () => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token')
       const response = await axios.get(`${BASE_URL}/api/inventory/history`, {
         headers: { Authorization: `Bearer ${token}` },
-      });
-      const raw = response.data.history || response.data.items || [];
-      setHistory(
-        raw.map((item) => ({
-          id: item.id ?? item._id,
-          name: item.nama_item,
-          condition: item.kondisi_fisik,
-          conditionLabel: item.kondisi_fisik,
-          storedIn: item.lokasi_penyimpanan,
-          buyDate: item.tanggal_beli,
-          status: item.archiveAction === "terpakai" ? "used" : "wasted",
-          imageUrl: item.foto_url ?? null,
-          category: item.jenis_item ?? item.kategori ?? "Lainnya",
-          updatedAt: item.updatedAt ?? item.updated_at,
-        })),
-      );
+      })
+      const raw = response.data.history || response.data.items || []
+      setHistory(raw.map(item => ({
+        id: item.id ?? item._id,
+        name: item.nama_item,
+        condition: item.kondisi_fisik,
+        conditionLabel: item.kondisi_fisik,
+        storedIn: item.lokasi_penyimpanan,
+        buyDate: item.tanggal_beli,
+        status: item.archiveAction === 'terpakai' ? 'used' : 'wasted',
+        imageUrl: item.foto_url ?? null,
+        category: item.jenis_item ?? item.kategori ?? 'Lainnya',
+        updatedAt: item.updatedAt ?? item.updated_at,
+      })))
     } catch (error) {
-      console.error("Error fetching history:", error);
+      console.error('Error fetching history:', error)
     }
-  };
+  }
 
   const fetchNotifications = async () => {
     try {
       const token = localStorage.getItem("token");
       const response = await axios.get(
         `${BASE_URL}/api/notifications/history`,
-        { headers: { Authorization: `Bearer ${token}` } },
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       console.log("NOTIF RESPONSE:", response.data);
-      const raw =
-        response.data.history ||
-        response.data.notifications ||
-        response.data.data ||
-        [];
+      const raw = response.data.history || response.data.notifications || response.data.data || [];
       setNotifications(
         raw.map((n) => ({
           id: n.id ?? n._id,
@@ -479,12 +425,12 @@ export function AppProvider({ children }) {
             : "Baru saja",
           emoji: n.type === "expired" ? "🔴" : n.type === "soon" ? "🟡" : "🔔",
           type: n.type,
-        })),
+        }))
       );
     } catch (error) {
       console.error("Error fetching notifications:", error);
     }
-  };
+  }
 
   useEffect(() => {
     if (screen === SCREENS.HOME) {
@@ -500,7 +446,7 @@ export function AppProvider({ children }) {
   }, [screen]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     if (token) {
       fetchNotifications();
       checkNotification();
@@ -514,143 +460,104 @@ export function AppProvider({ children }) {
 
   const addStock = async (item) => {
     try {
-      const token = localStorage.getItem("token");
+      const token = localStorage.getItem('token');
       const tempItem = {
-        id: "temp-" + Date.now(),
+        id: 'temp-' + Date.now(),
         name: item.name,
         category: item.category,
         condition: item.condition,
         conditionLabel: item.condition,
         storedIn: item.storedIn,
         buyDate: item.buyDate,
-        status: "fresh",
+        status: 'fresh',
         imageUrl: null,
-      };
-      setStocks((prev) => [tempItem, ...prev]);
-      setAddModalOpen(false);
-      setSuccessModalOpen(true);
-      await axios.post(
-        `${BASE_URL}/api/inventory`,
-        {
-          nama_item: item.name,
-          jenis_item: item.category,
-          kondisi_fisik: item.condition,
-          lokasi_penyimpanan: item.storedIn,
-          tanggal_beli: item.buyDate,
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      await Promise.all([fetchStocks(), checkNotification()]);
+      }
+      setStocks(prev => [tempItem, ...prev])
+      setAddModalOpen(false)
+      setSuccessModalOpen(true)
+      await axios.post(`${BASE_URL}/api/inventory`, {
+        nama_item: item.name,
+        jenis_item: item.category,
+        kondisi_fisik: item.condition,
+        lokasi_penyimpanan: item.storedIn,
+        tanggal_beli: item.buyDate,
+      }, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      await Promise.all([fetchStocks(), checkNotification()])
     } catch (error) {
-      console.error("Error menambahkan stok:", error);
-      setStocks((prev) =>
-        prev.filter((s) => !s.id.toString().startsWith("temp-")),
-      );
-      alert("Gagal menambahkan item. Silakan coba lagi.");
+      console.error('Error menambahkan stok:', error)
+      setStocks(prev => prev.filter(s => !s.id.toString().startsWith('temp-')))
+      alert('Gagal menambahkan item. Silakan coba lagi.')
     }
-  };
+  }
 
   const markUsed = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.patch(
-        `${BASE_URL}/api/inventory/${id}/used`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const token = localStorage.getItem('token');
+      await axios.patch(`${BASE_URL}/api/inventory/${id}/used`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchStocks();
       fetchHistory();
     } catch (error) {
-      alert("Gagal menandai item sebagai terpakai. Silakan coba lagi.");
+      alert('Gagal menandai item sebagai terpakai. Silakan coba lagi.')
     }
-  };
+  }
 
   const throwAway = async (id) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.patch(
-        `${BASE_URL}/api/inventory/${id}/wasted`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
+      const token = localStorage.getItem('token');
+      await axios.patch(`${BASE_URL}/api/inventory/${id}/wasted`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       fetchStocks();
       fetchHistory();
     } catch (error) {
-      alert("Gagal menandai item sebagai dibuang. Silakan coba lagi.");
+      alert('Gagal menandai item sebagai dibuang. Silakan coba lagi.')
     }
-  };
+  }
 
   const addBackToStock = async (histId) => {
     try {
-      const token = localStorage.getItem("token");
-      await axios.patch(
-        `${BASE_URL}/api/inventory/${histId}/restore`,
-        {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        },
-      );
-      await fetchStocks();
-      await fetchHistory();
+      const token = localStorage.getItem('token')
+      await axios.patch(`${BASE_URL}/api/inventory/${histId}/restore`, {}, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      await fetchStocks()
+      await fetchHistory()
     } catch (error) {
-      alert("Gagal mengembalikan item ke stok. Silakan coba lagi.");
+      alert('Gagal mengembalikan item ke stok. Silakan coba lagi.')
     }
-  };
+  }
 
   const value = {
-    screen,
-    navigate,
-    goBack,
-    activeTab,
-    switchTab,
-    stocks,
-    stockFilter,
-    setStockFilter,
-    addStock,
-    markUsed,
-    throwAway,
-    history,
-    historyFilter,
-    setHistoryFilter,
-    addBackToStock,
+    screen, navigate, goBack,
+    activeTab, switchTab,
+    stocks, stockFilter, setStockFilter, addStock, markUsed, throwAway,
+    history, historyFilter, setHistoryFilter, addBackToStock,
     notifications,
-    addModalOpen,
-    setAddModalOpen,
-    successModalOpen,
-    setSuccessModalOpen,
-    darkMode,
-    setDarkMode,
-    notifSetting,
-    setNotifSetting,
-    profile,
-    updateProfile,
-    selectedItem,
-    openItemDetail,
+    addModalOpen, setAddModalOpen,
+    successModalOpen, setSuccessModalOpen,
+    darkMode, setDarkMode,
+    notifSetting, setNotifSetting,
+    profile, updateProfile,
+    selectedItem, openItemDetail,
     setStocks,
     registerUser,
-    loginUser,
-    loginWithGoogle,
-    loginWithEmailLink,
-    authLoading,
-    initLoading,
-    fetchHistory,
-    fetchNotifications,
+    loginUser, loginWithGoogle, loginWithEmailLink,
+    authLoading, initLoading,
+    fetchHistory, fetchNotifications,
     logoutUser,
     saveNotificationToken,
     deleteNotificationToken,
-  };
+  }
 
-  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>
 }
 
 export const useApp = () => {
-  const ctx = useContext(AppContext);
-  if (!ctx) throw new Error("useApp must be used within AppProvider");
-  return ctx;
-};
+  const ctx = useContext(AppContext)
+  if (!ctx) throw new Error('useApp must be used within AppProvider')
+  return ctx
+}
