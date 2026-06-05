@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
 import api from '../utils/axiosInstance'
 import {
-  signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
+  signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
 } from 'firebase/auth'
 import { auth } from '../config/firebase'
@@ -52,27 +52,21 @@ export function AppProvider({ children }) {
       setAuthLoading(true)
       const provider = new GoogleAuthProvider()
       provider.setCustomParameters({ prompt: 'select_account' })
-
-      const result = await signInWithPopup(auth, provider)  // ← ganti ini
-
+      const result = await signInWithPopup(auth, provider)
       const token = await result.user.getIdToken()
       localStorage.setItem('token', token)
-
       await axios.post(`${BASE_URL}/api/auth/login`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}` }
       })
-
       setProfile(prev => ({
         ...prev,
         email: result.user.email,
         name: result.user.displayName || prev.name,
         avatarUrl: result.user.photoURL || null,
       }))
-
       await saveNotificationToken()
       setActiveTab(TABS.HOME)
       navigate(SCREENS.HOME)
-      return { success: true }
     } catch (error) {
       console.error('Google login error:', error)
       return { success: false, message: error.message || 'Gagal masuk dengan Google.' }
@@ -298,39 +292,6 @@ export function AppProvider({ children }) {
 
   useEffect(() => {
     const initAuth = async () => {
-      // 1. Cek redirect Google DULU, sebelum cek token
-      try {
-        const redirectResult = await getRedirectResult(auth)
-        if (redirectResult) {
-          const isLinking = localStorage.getItem('linkingGoogle')
-          if (isLinking) {
-            localStorage.removeItem('linkingGoogle')
-            localStorage.setItem('linkedGoogle', 'true')
-            setInitLoading(false)
-            return
-          }
-          const token = await redirectResult.user.getIdToken()
-          localStorage.setItem('token', token)
-          await axios.post(`${BASE_URL}/api/auth/login`, {}, {
-            headers: { Authorization: `Bearer ${token}` },
-          })
-          setProfile(prev => ({
-            ...prev,
-            email: redirectResult.user.email,
-            name: redirectResult.user.displayName || prev.name,
-            avatarUrl: redirectResult.user.photoURL || null,
-          }))
-          await saveNotificationToken()
-          setActiveTab(TABS.HOME)
-          navigate(SCREENS.HOME)
-          setInitLoading(false)
-          return
-        }
-      } catch (e) {
-        console.error('Redirect result error:', e)
-      }
-
-      // 2. Baru cek token seperti biasa
       const storedToken = localStorage.getItem('token')
       if (!storedToken) {
         setInitLoading(false)
