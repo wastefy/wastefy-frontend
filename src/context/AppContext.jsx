@@ -3,7 +3,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 import { SCREENS, TABS, BASE_URL } from '../constants'
 import api from '../utils/axiosInstance'
 import {
-  signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider,
+  signInWithEmailAndPassword, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider,
   sendSignInLinkToEmail, isSignInWithEmailLink, signInWithEmailLink
 } from 'firebase/auth'
 import { auth } from '../config/firebase'
@@ -50,34 +50,12 @@ export function AppProvider({ children }) {
     try {
       setAuthLoading(true)
       const provider = new GoogleAuthProvider()
-
-      provider.setCustomParameters({
-        prompt: 'select_account'
-      })
-
-      const userCredential = await signInWithPopup(auth, provider)
-      const token = await userCredential.user.getIdToken()
-      localStorage.setItem('token', token)
-
-      await axios.post(`${BASE_URL}/api/auth/login`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-
-      setProfile(prev => ({
-        ...prev,
-        email: userCredential.user.email,
-        name: userCredential.user.displayName || prev.name,
-        avatarUrl: userCredential.user.photoURL || null,
-      }))
-
-      await saveNotificationToken()
-      navigate(SCREENS.HOME)
-      return { success: true }
+      provider.setCustomParameters({ prompt: 'select_account' })
+      await signInWithRedirect(auth, provider)
     } catch (error) {
       console.error('Google login error:', error)
-      return { success: false, message: error.message || 'Gagal masuk dengan Google.' }
-    } finally {
       setAuthLoading(false)
+      return { success: false, message: error.message || 'Gagal masuk dengan Google.' }
     }
   }
 
@@ -313,6 +291,36 @@ export function AppProvider({ children }) {
             resolve(user)
           })
         })
+
+        // Tangkap hasil redirect Google login
+        // Tangkap hasil redirect Google login
+        const redirectResult = await getRedirectResult(auth)
+        if (redirectResult) {
+          const isLinking = localStorage.getItem('linkingGoogle')
+
+          if (isLinking) {
+            localStorage.removeItem('linkingGoogle')
+            localStorage.setItem('linkedGoogle', 'true')
+            setInitLoading(false)
+            return
+          }
+
+          const token = await redirectResult.user.getIdToken()
+          localStorage.setItem('token', token)
+          await axios.post(`${BASE_URL}/api/auth/login`, {}, {
+            headers: { Authorization: `Bearer ${token}` },
+          })
+          setProfile(prev => ({
+            ...prev,
+            email: redirectResult.user.email,
+            name: redirectResult.user.displayName || prev.name,
+            avatarUrl: redirectResult.user.photoURL || null,
+          }))
+          await saveNotificationToken()
+          navigate(SCREENS.HOME)
+          setInitLoading(false)
+          return
+        }
 
         const currentUser = auth.currentUser
         if (!currentUser) {
