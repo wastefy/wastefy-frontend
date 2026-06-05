@@ -24,9 +24,9 @@ export const TABS = {
 }
 
 export const STOCK_STATUS = {
-  FRESH:   'fresh',
-  SOON:    'soon',
-  EXPIRED: 'expired',
+  FRESH:   'Segar',
+  SOON:    'Segera',
+  EXPIRED: 'Kadaluarsa',
 }
 
 export const HISTORY_STATUS = {
@@ -50,7 +50,7 @@ export const STORAGE_LOCATIONS = [
 export const STATUS_LABELS = {
   fresh:   'Segar',
   soon:    'Segera',
-  expired: 'Kadaluarsa',
+  expired: 'Kadaluwarsa',
   used:    'Terpakai',
   wasted:  'Dibuang',
 }
