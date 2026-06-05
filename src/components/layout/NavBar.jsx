@@ -8,7 +8,7 @@ export default function DesktopNavbar() {
 
   const items = [
     {
-      label: "Home",
+      label: "Beranda",
       screen: SCREENS.HOME,
       icon: Home,
     },
